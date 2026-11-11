@@ -26,8 +26,9 @@ public sealed class UnlockViewModel : ObservableObject
 
         UnlockCommand = new RelayCommand(_ => _ = UnlockOrCreateAsync(), _ => CanSubmit());
         CloseAppCommand = new RelayCommand(_ => CloseApp());
-        ChooseVaultCommand = new RelayCommand(_ => ChooseVault());
-        UseDefaultVaultCommand = new RelayCommand(_ => UseDefaultVault());
+        ChooseVaultCommand = new RelayCommand(_ => ChooseVault(), _ => !IsBusy);
+        CreateVaultCommand = new RelayCommand(_ => ChooseNewVault(), _ => !IsBusy);
+        UseDefaultVaultCommand = new RelayCommand(_ => UseDefaultVault(), _ => !IsBusy);
     }
 
     public event EventHandler<VaultRepository>? Unlocked;
@@ -96,6 +97,7 @@ public sealed class UnlockViewModel : ObservableObject
 
     public ICommand UnlockCommand { get; }
     public ICommand CloseAppCommand { get; }
+    public ICommand CreateVaultCommand { get; }
     public ICommand ChooseVaultCommand { get; }
     public ICommand UseDefaultVaultCommand { get; }
 
@@ -121,6 +123,15 @@ public sealed class UnlockViewModel : ObservableObject
         var window = Application.Current?.MainWindow;
         if (window is not null) window.Close();
         else Application.Current?.Shutdown();
+    }
+
+    private void ChooseNewVault()
+    {
+        var dialog = new SaveFileDialog { Title = "Create a separate vault", Filter = "MyVault vault|*.vault", FileName = "new-vault.vault" };
+        if (dialog.ShowDialog() != true) return;
+        if (File.Exists(dialog.FileName)) { ErrorText = "Choose a new filename. Existing vaults are never overwritten."; return; }
+        ErrorText = null; Password = ""; ConfirmPassword = "";
+        SetVaultPath(dialog.FileName, true);
     }
 
     private void ChooseVault()

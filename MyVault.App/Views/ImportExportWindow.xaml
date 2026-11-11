@@ -48,6 +48,8 @@
                         Command="{Binding SaveBackupCommand}"
                         HorizontalAlignment="Left"
                         Style="{StaticResource PrimaryButton}"/>
+                    <Button Content="Restore encrypted backup…" Command="{Binding RestoreBackupCommand}" Margin="0,8,0,0"/>
+
             </StackPanel>
 
             <Separator Grid.Row="1" Margin="0,16" Background="{DynamicResource App.BorderSubtle}"/>

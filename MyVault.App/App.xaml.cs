@@ -16,6 +16,7 @@ public partial class App : Application
         {
             var settings = new SettingsService();
             ThemeService.Apply(settings.Current.Theme);
+            MotionService.Mode = settings.Current.Motion;
         }
         catch
         {

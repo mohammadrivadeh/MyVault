@@ -9,6 +9,7 @@ public class GlassWindow : Window
 {
     public GlassWindow()
     {
+        SetResourceReference(ForegroundProperty, "App.Text");
         WindowStyle = WindowStyle.None;
         AllowsTransparency = true;
         Background = System.Windows.Media.Brushes.Transparent;
@@ -24,12 +25,13 @@ public class GlassWindow : Window
             CornerRadius = new CornerRadius(14)
         });
 
+        Loaded += (_, _) => MotionService.Reveal(this);
         SourceInitialized += (_, _) =>
         {
             var hwnd = new WindowInteropHelper(this).Handle;
             WindowEffects.ApplyRoundedCorners(hwnd);
             // TEMP: acrylic call removed to isolate the build
-            WindowBlurHelper.EnableAcrylic(this, 0x1A1A2Eu, (byte)0xD9);
+            // Opaque themed surfaces preserve contrast across light and dark palettes.
         };
     }
 }

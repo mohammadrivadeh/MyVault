@@ -17,6 +17,10 @@ public sealed class SettingsViewModel : ObservableObject
     private readonly SettingsService _settings;
     private readonly VaultRepository _repository;
 
+    private string _theme;
+    private string _motion;
+    private readonly string _originalTheme;
+    private readonly string _originalMotion;
     private int _autoLockMinutes;
     private int _clearClipboardSeconds;
 
@@ -25,6 +29,8 @@ public sealed class SettingsViewModel : ObservableObject
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
 
+        _originalTheme = _theme = ThemeService.Normalize(settings.Current.Theme);
+        _originalMotion = _motion = settings.Current.Motion;
         _autoLockMinutes = settings.Current.AutoLockMinutes;
         _clearClipboardSeconds = settings.Current.ClearClipboardSeconds;
 
@@ -64,14 +70,23 @@ public sealed class SettingsViewModel : ObservableObject
         set => SetProperty(ref _clearClipboardSeconds, value);
     }
 
+    public IReadOnlyList<string> Themes => ThemeService.Themes;
+    public IReadOnlyList<string> MotionOptions { get; } = new[] { "System", "Full", "Off" };
+    public string Theme { get => _theme; set { if (SetProperty(ref _theme, value)) ThemeService.Apply(value); } }
+    public string Motion { get => _motion; set { if (SetProperty(ref _motion, value)) MotionService.Mode = value; } }
+    public void RevertPreview() { ThemeService.Apply(_originalTheme); MotionService.Mode = _originalMotion; }
     public RelayCommand ChangePasswordCommand { get; }
 
-    public void Apply()
+    public bool Apply()
     {
+        var before = (_settings.Current.AutoLockMinutes, _settings.Current.ClearClipboardSeconds, _settings.Current.Theme, _settings.Current.Motion);
         _settings.Current.AutoLockMinutes = AutoLockMinutes;
         _settings.Current.ClearClipboardSeconds = ClearClipboardSeconds;
-        _settings.Current.Theme = ThemeService.MoonlightGlow;
-        _settings.Save();
+        _settings.Current.Theme = Theme;
+        _settings.Current.Motion = Motion;
+        if (_settings.Save()) return true;
+        (_settings.Current.AutoLockMinutes, _settings.Current.ClearClipboardSeconds, _settings.Current.Theme, _settings.Current.Motion) = before;
+        return false;
     }
 
     private void OpenChangePassword()

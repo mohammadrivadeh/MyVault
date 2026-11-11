@@ -10,11 +10,16 @@ public partial class SettingsWindow : GlassWindow
         InitializeComponent();
     }
 
+    protected override void OnClosed(EventArgs e)
+    {
+        if (DialogResult != true && DataContext is SettingsViewModel vm) vm.RevertPreview();
+        base.OnClosed(e);
+    }
     private void Save_Click(object sender, RoutedEventArgs e)
     {
         if (DataContext is SettingsViewModel vm)
         {
-            vm.Apply();
+            if (!vm.Apply()) { MyVault.App.Services.Dialogs.Error("Settings could not be saved. Check folder permissions.", "Save failed", this); return; }
             DialogResult = true;
         }
         Close();

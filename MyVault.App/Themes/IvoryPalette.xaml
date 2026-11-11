@@ -1,0 +1,25 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <SolidColorBrush x:Key="App.Background" Color="#F8F6F1"/>
+    <SolidColorBrush x:Key="App.Surface" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="App.SurfaceAlt" Color="#F0EEE8"/>
+    <SolidColorBrush x:Key="App.SurfaceGlass" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="App.SurfaceGlassAlt" Color="#F0EEE8"/>
+    <SolidColorBrush x:Key="App.SurfaceHover" Color="#E4E8EF"/>
+    <SolidColorBrush x:Key="App.Border" Color="#7C8391"/>
+    <SolidColorBrush x:Key="App.BorderSubtle" Color="#7C8391"/>
+    <SolidColorBrush x:Key="App.BorderStrong" Color="#7C8391"/>
+    <SolidColorBrush x:Key="App.BorderGlass" Color="#7C8391"/>
+    <SolidColorBrush x:Key="App.Text" Color="#202733"/>
+    <SolidColorBrush x:Key="App.TextMuted" Color="#4B5667"/>
+    <SolidColorBrush x:Key="App.TextDisabled" Color="#606B79"/>
+    <SolidColorBrush x:Key="App.TextOnAccent" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="App.Accent" Color="#194FA3"/>
+    <SolidColorBrush x:Key="App.AccentHover" Color="#194FA3"/>
+    <SolidColorBrush x:Key="App.AccentPressed" Color="#194FA3"/>
+    <SolidColorBrush x:Key="App.AccentSubtle" Color="#E4E8EF"/>
+    <SolidColorBrush x:Key="App.Error" Color="#A91E2C"/>
+    <SolidColorBrush x:Key="App.ErrorBg" Color="#FDE9EA"/>
+    <SolidColorBrush x:Key="App.Warning" Color="#805000"/>
+    <SolidColorBrush x:Key="App.WarningBg" Color="#FFF0CC"/>
+    <SolidColorBrush x:Key="App.Success" Color="#176636"/>
+</ResourceDictionary>

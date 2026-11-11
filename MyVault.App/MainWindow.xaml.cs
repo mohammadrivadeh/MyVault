@@ -37,6 +37,7 @@ public partial class MainWindow : Window
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
+        _vm?.InitializeClipboard(this);
         if (_vm is not null)
             ApplyWindowMode(_vm.CurrentScreen is VaultViewModel);
     }
@@ -53,6 +54,16 @@ public partial class MainWindow : Window
         if (ReferenceEquals(ContentHost.Content, newScreen)) return;
 
         bool targetIsVault = newScreen is VaultViewModel;
+        if (!targetIsVault || !MotionService.Enabled)
+        {
+            ContentHost.BeginAnimation(UIElement.OpacityProperty, null);
+            ContentHost.Opacity = 1;
+            ContentHost.Content = newScreen;
+            TitleBarGrid.Visibility = targetIsVault ? Visibility.Visible : Visibility.Collapsed;
+            TitleBarGrid.Opacity = targetIsVault ? 1 : 0;
+            ApplyWindowMode(targetIsVault);
+            return;
+        }
 
         // Cancel any in-flight animations on the container / title bar
         ContentHost.BeginAnimation(UIElement.OpacityProperty, null);

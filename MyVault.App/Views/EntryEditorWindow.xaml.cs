@@ -27,6 +27,7 @@ public partial class EntryEditorWindow : GlassWindow
         // Initial fill of PasswordBox from the VM.
         _syncing = true;
         PwdBox.Password = Vm.Password;
+        TotpBox.Password = Vm.TotpSecret;
         _syncing = false;
 
         TitleBox.Focus();
@@ -91,6 +92,10 @@ public partial class EntryEditorWindow : GlassWindow
         _syncing = false;
     }
 
+    private void TotpBox_PasswordChanged(object sender, RoutedEventArgs e)
+    {
+        if (!_syncing && Vm is not null) Vm.TotpSecret = TotpBox.Password;
+    }
     private void Save_Click(object sender, RoutedEventArgs e)
     {
         if (Vm is null) return;

@@ -49,6 +49,10 @@
                           SelectedValuePath="Value"
                           DisplayMemberPath="Label"/>
 
+                <TextBlock Text="Color theme (live preview)" Foreground="{DynamicResource App.TextMuted}" Margin="0,12,0,4"/>
+                <ComboBox ItemsSource="{Binding Themes}" SelectedItem="{Binding Theme, Mode=TwoWay}"/>
+                <TextBlock Text="Motion (always respects Windows reduced motion)" Foreground="{DynamicResource App.TextMuted}" Margin="0,12,0,4" TextWrapping="Wrap"/>
+                <ComboBox ItemsSource="{Binding MotionOptions}" SelectedItem="{Binding Motion, Mode=TwoWay}"/>
                 <TextBlock Text="Master password"
                            FontSize="11" FontWeight="SemiBold"
                            Foreground="{DynamicResource App.TextMuted}"

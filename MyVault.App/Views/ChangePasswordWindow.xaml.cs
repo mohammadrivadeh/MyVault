@@ -11,6 +11,8 @@ public partial class ChangePasswordWindow : GlassWindow
         InitializeComponent();
     }
 
+    private bool _closed;
+    protected override void OnClosed(EventArgs e) { _closed = true; base.OnClosed(e); }
     private ChangePasswordViewModel? Vm => DataContext as ChangePasswordViewModel;
 
     private void CurrentBox_PasswordChanged(object sender, RoutedEventArgs e)
@@ -35,11 +37,12 @@ public partial class ChangePasswordWindow : GlassWindow
     {
         if (Vm is null) return;
 
+        if (Vm.IsBusy) return;
         ChangeButton.IsEnabled = false;
         try
         {
             bool ok = await Vm.TryChangeAsync();
-            if (ok)
+            if (ok && !_closed)
             {
                 DialogResult = true;
                 Close();
@@ -47,12 +50,13 @@ public partial class ChangePasswordWindow : GlassWindow
         }
         finally
         {
-            ChangeButton.IsEnabled = true;
+            if (!_closed) ChangeButton.IsEnabled = true;
         }
     }
 
     private void Cancel_Click(object sender, RoutedEventArgs e)
     {
+        if (Vm?.IsBusy == true) return;
         DialogResult = false;
         Close();
     }

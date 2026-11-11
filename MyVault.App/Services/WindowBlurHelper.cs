@@ -52,7 +52,7 @@ public static class WindowBlurHelper
         {
             AccentState = (int)AccentState.AccentEnableAcrylicBlurBehind,
             AccentFlags = 2,
-            GradientColor = (int)((opacity << 24) | (tintColor & 0xFFFFFF)),
+            GradientColor = unchecked((int)(((uint)opacity << 24) | (tintColor & 0xFFFFFFu))),
             AnimationId = 0
         };
 
