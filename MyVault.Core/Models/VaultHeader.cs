@@ -31,7 +31,7 @@ public sealed class VaultHeader
         if (Magic != CurrentMagic)
             throw new VaultException(VaultError.Corrupted, "Not a valid vault file.");
 
-        if (FormatVersion > CurrentFormatVersion)
+        if (FormatVersion != CurrentFormatVersion)
             throw new VaultException(
                 VaultError.UnsupportedVersion,
                 $"Vault format version {FormatVersion} is not supported by this app version.");
@@ -41,10 +41,12 @@ public sealed class VaultHeader
                 VaultError.UnsupportedVersion,
                 $"Unsupported KDF '{Kdf}'.");
 
-        if (Salt is not { Length: >= 8 })
+        if (Salt is not { Length: >= 8 and <= 64 })
             throw new VaultException(VaultError.Corrupted, "Invalid salt in header.");
 
-        if (MemoryKiB < 8 || Iterations < 1 || Parallelism < 1)
+        if (MemoryKiB < 8 || MemoryKiB > 1024 * 1024 ||
+            Iterations < 1 || Iterations > 10 || Parallelism < 1 || Parallelism > 16 ||
+            MemoryKiB < 8 * Parallelism)
             throw new VaultException(VaultError.Corrupted, "Invalid KDF parameters in header.");
     }
 }

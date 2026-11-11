@@ -19,6 +19,7 @@ namespace MyVault.Core.Storage;
 /// </summary>
 public static class VaultFile
 {
+    public const long MaxFileBytes = 64 * 1024 * 1024;
     public const int MagicSize = 5;
     public const int HeaderLenSize = 4;
     public static readonly string Magic = VaultHeader.CurrentMagic;
@@ -37,6 +38,7 @@ public static class VaultFile
 
     public static VaultHeader ReadHeader(ReadOnlySpan<byte> blob)
     {
+        if (blob.Length > MaxFileBytes) throw new VaultException(VaultError.Corrupted, "Vault exceeds size limit.");
         int aadLength = GetAadLength(blob);
         var headerJson = blob.Slice(MagicSize + HeaderLenSize, aadLength - MagicSize - HeaderLenSize);
 
@@ -64,6 +66,7 @@ public static class VaultFile
         ArgumentNullException.ThrowIfNull(document);
         ArgumentNullException.ThrowIfNull(header);
         header.Validate();
+        document.Validate();
 
         var headerJson = JsonSerializer.SerializeToUtf8Bytes(header, JsonOptions);
         int headerLen = headerJson.Length;
@@ -103,6 +106,7 @@ public static class VaultFile
 
     public static VaultDocument Decrypt(ReadOnlySpan<byte> blob, ReadOnlySpan<byte> key)
     {
+        if (blob.Length > MaxFileBytes) throw new VaultException(VaultError.Corrupted, "Vault exceeds size limit.");
         int aadLength = GetAadLength(blob);
 
         int minimum = aadLength + Aead.NonceSize + Aead.TagSize;
@@ -129,6 +133,7 @@ public static class VaultFile
             }
             if (doc is null)
                 throw new VaultException(VaultError.Corrupted, "Empty document.");
+            doc.Validate();
             return doc;
         }
         finally
@@ -143,7 +148,12 @@ public static class VaultFile
     {
         try
         {
-            return File.ReadAllBytes(path);
+            using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+            if (stream.Length > MaxFileBytes)
+                throw new VaultException(VaultError.Corrupted, "Vault exceeds the 64 MiB limit.");
+            byte[] data = new byte[checked((int)stream.Length)];
+            stream.ReadExactly(data);
+            return data;
         }
         catch (FileNotFoundException ex)
         {
@@ -179,11 +189,12 @@ public static class VaultFile
         if (maxBackups > 0 && File.Exists(fullPath))
             RotateBackups(fullPath, maxBackups);
 
-        string tmpPath = fullPath + ".tmp";
+        if (blob.LongLength > MaxFileBytes) throw new VaultException(VaultError.InvalidParameters, "Vault exceeds size limit.");
+        string tmpPath = fullPath + "." + Guid.NewGuid().ToString("N") + ".tmp";
         try
         {
             using (var fs = new FileStream(
-                tmpPath, FileMode.Create, FileAccess.Write, FileShare.None,
+                tmpPath, FileMode.CreateNew, FileAccess.Write, FileShare.None,
                 bufferSize: 4096, FileOptions.WriteThrough))
             {
                 fs.Write(blob, 0, blob.Length);
