@@ -18,6 +18,7 @@ public sealed class ImportExportViewModel : ObservableObject
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _backup = backup ?? throw new ArgumentNullException(nameof(backup));
 
+        RestoreBackupCommand = new RelayCommand(_ => RestoreBackup());
         SaveBackupCommand = new RelayCommand(_ => SaveBackup());
         ExportCsvCommand = new RelayCommand(_ => ExportCsv());
         ImportCsvCommand = new RelayCommand(_ => ImportCsv());
@@ -29,12 +30,30 @@ public sealed class ImportExportViewModel : ObservableObject
     public IReadOnlyList<VaultEntry>? ImportedEntries { get; private set; }
     public string? FinalStatusMessage { get; private set; }
 
+    public bool Restored { get; private set; }
+    public RelayCommand RestoreBackupCommand { get; }
     public RelayCommand SaveBackupCommand { get; }
     public RelayCommand ExportCsvCommand { get; }
     public RelayCommand ImportCsvCommand { get; }
     public RelayCommand DownloadTemplateCommand { get; }
 
     // --------------------------------------------------------------------
+
+    private void RestoreBackup()
+    {
+        var dialog = new OpenFileDialog { Title = "Restore encrypted backup", Filter = "Vault and backups|*.vault;*.dat;*.bak.*|All files|*.*" };
+        if (dialog.ShowDialog() != true) return;
+        if (!Dialogs.Confirm("Replace current entries with this backup? The current vault will be rotated into a backup first. Backups from before a master-password change require their original password and must be opened separately.", "Restore backup")) return;
+        byte[]? blob = null;
+        try
+        {
+            blob = VaultFile.Read(dialog.FileName);
+            _repository.RestoreBackup(blob);
+            Restored = true; FinalStatusMessage = "Backup restored."; CloseRequested?.Invoke(this, EventArgs.Empty);
+        }
+        catch (Exception ex) { Dialogs.Error("Restore failed. Current vault was preserved.\n\n" + ex.Message, "Restore failed"); }
+        finally { if (blob is not null) Array.Clear(blob); }
+    }
 
     private void SaveBackup()
     {
@@ -72,7 +91,7 @@ public sealed class ImportExportViewModel : ObservableObject
 
         if (!Dialogs.Confirm(
                 "This will create a PLAINTEXT CSV file with every username and password in your vault.\n\n" +
-                "Anyone who gets that file can read all your passwords.\n\n" +
+                "Anyone who gets that file can read all your passwords.\n\nCSV excludes Trash, categories, favorites, TOTP and timestamps. Use an encrypted backup for a complete copy. Opening untrusted CSV in a spreadsheet may interpret formulas.\n\n" +
                 "Delete it as soon as you've imported it into whatever tool you need.\n\n" +
                 "Continue?",
                 "Export to CSV"))
@@ -91,7 +110,7 @@ public sealed class ImportExportViewModel : ObservableObject
             var header = new[] { "Title", "Username", "Password", "URL", "Notes", "Tags" };
             var rows = new List<IEnumerable<string?>> { header };
 
-            foreach (var e in _repository.Document.Entries)
+            foreach (var e in _repository.Document.Entries.Where(e => e.DeletedAt is null))
             {
                 rows.Add(new[]
                 {
@@ -153,13 +172,13 @@ public sealed class ImportExportViewModel : ObservableObject
         string message = $"Found {preview.Entries.Count} entries to import.";
         if (preview.Skipped > 0)
             message += $"\n{preview.Skipped} rows skipped (missing title).";
-        message += "\n\nAdd these entries to your vault now?";
+        message += "\n\nExact matches by title, username and URL will be skipped. Existing entries will not be overwritten. Add the remaining entries?";
 
         if (!Dialogs.Confirm(message, "Import from CSV"))
             return;
 
-        ImportedEntries = preview.Entries;
-        FinalStatusMessage = $"{preview.Entries.Count} entries imported.";
+        ImportedEntries = preview.Entries.DistinctBy(e => (e.Title.ToUpperInvariant(), e.Username, e.Url)).Where(entry => !_repository.Document.Entries.Any(e => e.DeletedAt is null && string.Equals(e.Title, entry.Title, StringComparison.OrdinalIgnoreCase) && e.Username == entry.Username && e.Url == entry.Url)).ToList();
+        FinalStatusMessage = $"{ImportedEntries.Count} entries imported; {preview.Entries.Count - ImportedEntries.Count} duplicates skipped.";
         CloseRequested?.Invoke(this, EventArgs.Empty);
     }
 

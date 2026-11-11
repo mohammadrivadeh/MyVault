@@ -24,7 +24,9 @@ public sealed class BackupService
         if (!_repository.IsUnlocked)
             throw new InvalidOperationException("Vault is locked.");
 
-        byte[] blob = File.ReadAllBytes(_repository.VaultPath);
+        if (string.Equals(Path.GetFullPath(destinationPath), _repository.VaultPath, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException("Choose a destination different from the active vault.");
+        byte[] blob = VaultFile.Read(_repository.VaultPath);
 
         if (!_repository.VerifyExternalVault(blob))
         {
@@ -38,7 +40,10 @@ public sealed class BackupService
             string? dir = Path.GetDirectoryName(Path.GetFullPath(destinationPath));
             if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
 
-            File.WriteAllBytes(destinationPath, blob);
+            VaultFile.WriteAtomic(destinationPath, blob, maxBackups: 0);
+            byte[] copy = VaultFile.Read(destinationPath);
+            try { if (!copy.AsSpan().SequenceEqual(blob) || !_repository.VerifyExternalVault(copy)) throw new IOException("Backup verification failed."); }
+            finally { Array.Clear(copy); }
         }
         finally
         {

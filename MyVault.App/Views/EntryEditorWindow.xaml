@@ -87,6 +87,18 @@
                                     Margin="6,0,0,0"
                                     Command="{Binding GenerateCommand}"/>
                         </Grid>
+                        <Expander Header="Generator options" Foreground="{DynamicResource App.Text}" Margin="0,8,0,0">
+                            <StackPanel>
+                                <TextBlock Text="Length (4–256)"/><TextBox Text="{Binding GeneratorLength}"/>
+                                <WrapPanel>
+                                    <CheckBox Content="A–Z" IsChecked="{Binding GenerateUpper}" Margin="4"/>
+                                    <CheckBox Content="a–z" IsChecked="{Binding GenerateLower}" Margin="4"/>
+                                    <CheckBox Content="0–9" IsChecked="{Binding GenerateDigits}" Margin="4"/>
+                                    <CheckBox Content="Symbols" IsChecked="{Binding GenerateSymbols}" Margin="4"/>
+                                    <CheckBox Content="Avoid ambiguous" IsChecked="{Binding AvoidAmbiguous}" Margin="4"/>
+                                </WrapPanel>
+                            </StackPanel>
+                        </Expander>
                         <TextBlock Text="{Binding PasswordStrengthLabel}"
                                    FontSize="11" Foreground="{DynamicResource App.TextMuted}"
                                    Margin="0,4,0,0"/>
@@ -126,6 +138,9 @@
                         <TextBox Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}"
                                  AcceptsReturn="True" TextWrapping="Wrap"
                                  Height="80" VerticalScrollBarVisibility="Auto"/>
+                        <TextBlock Text="TOTP secret (Base32; SHA-1 / 6 digits / 30 seconds)" TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}" Margin="0,12,0,4"/>
+                        <PasswordBox x:Name="TotpBox" PasswordChanged="TotpBox_PasswordChanged"/>
+                        <TextBlock Text="Stored encrypted with this vault. Keep a separate recovery method." TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}" Margin="0,4,0,0"/>
                     </StackPanel>
                 </Grid>
             </ScrollViewer>

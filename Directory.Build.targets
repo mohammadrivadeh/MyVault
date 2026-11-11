@@ -1,0 +1,6 @@
+<Project>
+  <!-- Publishing resolves RID-specific SDK tooling; keep it out of development lockfiles. -->
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' != ''">
+    <NuGetLockFilePath>$(MSBuildProjectDirectory)/obj/publish-$(RuntimeIdentifier).packages.lock.json</NuGetLockFilePath>
+  </PropertyGroup>
+</Project>

@@ -6,6 +6,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using MyVault.App.ViewModels;
+using MyVault.App.Services;
 
 namespace MyVault.App.Views;
 
@@ -14,6 +15,7 @@ public partial class VaultView : UserControl
     public VaultView()
     {
         InitializeComponent();
+        SizeChanged += (_, _) => DetailsPanel.Visibility = ActualWidth >= 1050 ? Visibility.Visible : Visibility.Collapsed;
         // Hide elements before first render (safe — null-checked)
         HideAll();
 
@@ -23,6 +25,7 @@ public partial class VaultView : UserControl
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         Loaded -= OnLoaded;
+        if (!MotionService.Enabled) { ShowAll(); return; }
 
         // Start animation at Render priority (fires sooner than Loaded)
         Dispatcher.BeginInvoke(new Action(PlayIntroAnimation), DispatcherPriority.Render);
@@ -140,7 +143,7 @@ public partial class VaultView : UserControl
 
     protected override void OnPreviewKeyDown(KeyEventArgs e)
     {
-        if (e.Key == Key.F && (Keyboard.Modifiers & ModifierKeys.Control) != 0)
+        if ((e.Key == Key.F || e.Key == Key.K) && (Keyboard.Modifiers & ModifierKeys.Control) != 0)
         {
             Keyboard.Focus(SearchBox);
             SearchBox.SelectAll();

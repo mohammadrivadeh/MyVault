@@ -14,6 +14,7 @@ public partial class ImportExportWindow : GlassWindow
     }
 
     public IReadOnlyList<MyVault.Core.Models.VaultEntry>? ImportedEntries => _vm?.ImportedEntries;
+    public bool Restored => _vm?.Restored == true;
     public string? FinalStatusMessage => _vm?.FinalStatusMessage;
 
     private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)

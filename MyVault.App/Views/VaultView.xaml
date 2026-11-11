@@ -14,8 +14,9 @@
 
     <Grid Background="{DynamicResource App.Background}">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="210"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
         <!-- ========== SIDEBAR ========== -->
@@ -53,10 +54,10 @@
                             Width="22" Height="22"
                             Padding="0"
                             Cursor="Hand"
-                            Background="#1E2C4A"
-                            BorderBrush="#6BA6FF"
+                            Background="{DynamicResource App.AccentSubtle}"
+                            BorderBrush="{DynamicResource App.Accent}"
                             BorderThickness="1"
-                            Foreground="#6BA6FF"
+                            Foreground="{DynamicResource App.Accent}"
                             ToolTip="New category"
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center">
@@ -77,11 +78,11 @@
                                 </Border>
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="Bd" Property="Background" Value="#2A3D5C"/>
-                                        <Setter Property="BorderBrush" Value="#8DBDFF"/>
+                                        <Setter TargetName="Bd" Property="Background" Value="{DynamicResource App.SurfaceHover}"/>
+                                        <Setter Property="BorderBrush" Value="{DynamicResource App.AccentHover}"/>
                                     </Trigger>
                                     <Trigger Property="IsPressed" Value="True">
-                                        <Setter TargetName="Bd" Property="Background" Value="#1A2540"/>
+                                        <Setter TargetName="Bd" Property="Background" Value="{DynamicResource App.SurfaceAlt}"/>
                                     </Trigger>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
@@ -118,6 +119,13 @@
                               MaxHeight="220"
                               VerticalScrollBarVisibility="Auto"
                               HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel>
+                    <WrapPanel Margin="0,0,0,8">
+                        <Button Content="Weak" Command="{Binding SetFilterCommand}" CommandParameter="Weak" Padding="6,4" Margin="2"/>
+                        <Button Content="Reused" Command="{Binding SetFilterCommand}" CommandParameter="Reused" Padding="6,4" Margin="2"/>
+                        <Button Content="Recent" Command="{Binding SetFilterCommand}" CommandParameter="Recent" Padding="6,4" Margin="2"/>
+                        <Button Content="Trash" Command="{Binding SetFilterCommand}" CommandParameter="Trash" Padding="6,4" Margin="2"/>
+                    </WrapPanel>
                     <ItemsControl ItemsSource="{Binding Categories}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="{x:Type vm:CategoryViewModel}">
@@ -169,6 +177,7 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
+                    </StackPanel>
                 </ScrollViewer>
 
                 <!-- Row 6: Bottom actions -->
@@ -236,11 +245,13 @@
                     BorderBrush="{DynamicResource App.BorderGlass}"
                     BorderThickness="1" CornerRadius="12" Padding="6">
                 <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="125"/></Grid.ColumnDefinitions>
+                    <ComboBox Grid.Column="1" ItemsSource="{Binding SortOptions}" SelectedItem="{Binding SortBy}" ToolTip="Sort entries" AutomationProperties.Name="Sort entries"/>
                     <TextBox x:Name="SearchBox"
                              Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                              BorderThickness="0" Background="Transparent"
                              Padding="10,7" FontSize="13"/>
-                    <TextBlock Text="Search entries…"
+                    <TextBlock Text="Search entries…  Ctrl+K"
                                Foreground="{DynamicResource App.TextDisabled}"
                                Margin="12,0,0,0" VerticalAlignment="Center"
                                IsHitTestVisible="False">
@@ -270,6 +281,8 @@
 
                 <Grid>
                     <ListBox x:Name="EntryList"
+                             VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
+                             ScrollViewer.CanContentScroll="True"
                              ItemsSource="{Binding EntriesView}"
                              SelectedItem="{Binding SelectedEntry}"
                              BorderThickness="0" Background="Transparent"
@@ -457,5 +470,29 @@
                 </Grid>
             </Border>
         </Grid>
+        <Border x:Name="DetailsPanel" Grid.Column="2" Width="270" Margin="0,16,16,16" Padding="18"
+                Background="{DynamicResource App.Surface}" BorderBrush="{DynamicResource App.Border}" BorderThickness="1" CornerRadius="12">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Text="ENTRY DETAILS" Foreground="{DynamicResource App.TextMuted}" Margin="0,0,0,16"/>
+                    <TextBlock Text="{Binding SelectedEntry.Title, TargetNullValue=Select an entry}" Foreground="{DynamicResource App.Text}" FontSize="19" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                    <TextBlock Text="Username" Foreground="{DynamicResource App.TextMuted}" Margin="0,18,0,4"/>
+                    <TextBlock Text="{Binding SelectedEntry.Model.Username}" Foreground="{DynamicResource App.Text}" TextWrapping="Wrap"/>
+                    <Button Content="Copy username" Command="{Binding CopyUsernameCommand}" Margin="0,8,0,0"/>
+                    <TextBlock Text="Password" Foreground="{DynamicResource App.TextMuted}" Margin="0,18,0,4"/>
+                    <TextBlock Text="••••••••••••" Foreground="{DynamicResource App.Text}"/>
+                    <Button Content="Copy password" Command="{Binding CopyPasswordCommand}" Margin="0,8,0,0"/>
+                    <Button Content="Copy one-time code" Command="{Binding CopyTotpCommand}" Margin="0,8,0,0"/>
+                    <TextBlock Text="Website" Foreground="{DynamicResource App.TextMuted}" Margin="0,18,0,4"/>
+                    <TextBlock Text="{Binding SelectedEntry.Model.Url}" Foreground="{DynamicResource App.Text}" TextWrapping="Wrap"/>
+                    <TextBlock Text="Notes" Foreground="{DynamicResource App.TextMuted}" Margin="0,18,0,4"/>
+                    <TextBlock Text="{Binding SelectedEntry.Model.Notes}" Foreground="{DynamicResource App.Text}" TextWrapping="Wrap"/>
+                    <TextBlock Text="Last updated" Foreground="{DynamicResource App.TextMuted}" Margin="0,18,0,4"/>
+                    <TextBlock Text="{Binding SelectedEntry.Model.UpdatedAt, StringFormat={}{0:g}}" Foreground="{DynamicResource App.Text}"/>
+                    <Button Content="Edit entry" Command="{Binding EditCommand}" Margin="0,18,0,0"/>
+                    <Button Content="Restore from Trash" Command="{Binding RestoreCommand}" Margin="0,8,0,0"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
     </Grid>
 </UserControl>

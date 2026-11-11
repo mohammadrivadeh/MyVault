@@ -14,7 +14,7 @@ namespace MyVault.App.ViewModels;
 
 public sealed class VaultViewModel : ObservableObject
 {
-    public enum FilterKind { All, Favorites, Category }
+    public enum FilterKind { All, Favorites, Category, Weak, Reused, Recent, Trash }
 
     private readonly VaultRepository _repository;
     private readonly ClipboardService _clipboard;
@@ -23,6 +23,8 @@ public sealed class VaultViewModel : ObservableObject
     private readonly DispatcherTimer _statusTimer;
     private readonly DispatcherTimer _countdownTimer;
 
+    private bool _locked;
+    private string _sortBy = "Title";
     private string _searchText = string.Empty;
     private VaultEntryViewModel? _selectedEntry;
     private FilterKind _currentFilter = FilterKind.All;
@@ -60,6 +62,7 @@ public sealed class VaultViewModel : ObservableObject
 
         EntriesView = CollectionViewSource.GetDefaultView(Entries);
         EntriesView.Filter = FilterEntry;
+        ApplySort();
 
         _statusTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
         _statusTimer.Tick += (_, _) => { _statusTimer.Stop(); StatusMessage = null; };
@@ -70,6 +73,8 @@ public sealed class VaultViewModel : ObservableObject
         };
         _countdownTimer.Tick += OnCountdownTick;
 
+        RestoreCommand = new RelayCommand(p => RestoreEntry(Resolve(p)));
+        CopyTotpCommand = new RelayCommand(p => CopyTotp(Resolve(p)));
         LockCommand = new RelayCommand(_ => Lock());
         AddCommand = new RelayCommand(_ => AddEntry());
         EditCommand = new RelayCommand(p => EditEntry(Resolve(p)), p => Resolve(p) is not null);
@@ -186,6 +191,15 @@ public sealed class VaultViewModel : ObservableObject
             ? "No entries yet — press Ctrl+N or click + New to add one."
             : "No entries match your filter or search.";
 
+    public IReadOnlyList<string> SortOptions { get; } = new[] { "Title", "Updated", "Created" };
+    public string SortBy { get => _sortBy; set { if (SetProperty(ref _sortBy, value)) ApplySort(); } }
+    private void ApplySort()
+    {
+        EntriesView.SortDescriptions.Clear();
+        EntriesView.SortDescriptions.Add(new SortDescription(_sortBy == "Title" ? "Title" : _sortBy == "Updated" ? "Model.UpdatedAt" : "Model.CreatedAt", _sortBy == "Title" ? ListSortDirection.Ascending : ListSortDirection.Descending));
+    }
+    public ICommand RestoreCommand { get; }
+    public ICommand CopyTotpCommand { get; }
     public ICommand LockCommand { get; }
     public ICommand AddCommand { get; }
     public ICommand EditCommand { get; }
@@ -214,16 +228,14 @@ public sealed class VaultViewModel : ObservableObject
         {
             Owner = Application.Current.MainWindow
         };
-        if (dialog.ShowDialog() != true) return;
+        if (dialog.ShowDialog() != true || _locked) return;
 
         var category = new Category
         {
             Name = dialog.CategoryName.Trim(),
             Order = Categories.Count == 0 ? 0 : Categories.Max(c => c.Model.Order) + 1
         };
-        _repository.Document.Categories.Add(category);
-        _repository.Save();
-        Categories.Add(new CategoryViewModel(category));
+        Commit(d => d.Categories.Add(category));
     }
 
     private void RenameCategory(CategoryViewModel? catVm)
@@ -235,11 +247,9 @@ public sealed class VaultViewModel : ObservableObject
         {
             Owner = Application.Current.MainWindow
         };
-        if (dialog.ShowDialog() != true) return;
+        if (dialog.ShowDialog() != true || _locked) return;
 
-        catVm.Model.Name = dialog.CategoryName.Trim();
-        _repository.Save();
-        catVm.RefreshName();
+        Commit(d => d.Categories.Single(c => c.Id == catVm.Id).Name = dialog.CategoryName.Trim());
     }
 
     private void DeleteCategory(CategoryViewModel? catVm)
@@ -254,12 +264,11 @@ public sealed class VaultViewModel : ObservableObject
         if (!Dialogs.Confirm(msg, "Delete category"))
             return;
 
-        foreach (var entry in _repository.Document.Entries.Where(e => e.CategoryId == catVm.Id))
-            entry.CategoryId = null;
-
-        _repository.Document.Categories.Remove(catVm.Model);
-        _repository.Save();
-        Categories.Remove(catVm);
+        if (!Commit(d =>
+        {
+            foreach (var entry in d.Entries.Where(e => e.CategoryId == catVm.Id)) entry.CategoryId = null;
+            d.Categories.RemoveAll(c => c.Id == catVm.Id);
+        })) return;
 
         if (SelectedCategoryId == catVm.Id)
             ApplyFilter(FilterKind.All, null);
@@ -293,6 +302,10 @@ public sealed class VaultViewModel : ObservableObject
     private bool FilterEntry(object obj)
     {
         if (obj is not VaultEntryViewModel vm) return false;
+        if ((_currentFilter == FilterKind.Trash) != (vm.Model.DeletedAt is not null)) return false;
+        if (_currentFilter == FilterKind.Weak && MyVault.Core.Services.PasswordStrength.Categorize(vm.Password) != MyVault.Core.Services.PasswordStrengthLevel.Weak) return false;
+        if (_currentFilter == FilterKind.Reused && (string.IsNullOrEmpty(vm.Password) || _repository.Document.Entries.Count(e => e.DeletedAt is null && e.Password == vm.Password) < 2)) return false;
+        if (_currentFilter == FilterKind.Recent && vm.Model.UpdatedAt < DateTimeOffset.UtcNow.AddDays(-30)) return false;
 
         if (_currentFilter == FilterKind.Favorites && !vm.IsFavorite) return false;
 
@@ -333,26 +346,20 @@ public sealed class VaultViewModel : ObservableObject
 
         var entry = new VaultEntry();
         editor.ApplyTo(entry);
-        _repository.Document.Entries.Add(entry);
-        _repository.Save();
-
-        var vm = new VaultEntryViewModel(entry);
-        Entries.Add(vm);
-        SelectedEntry = vm;
+        if (!Commit(d => d.Entries.Add(entry))) return;
+        SelectedEntry = Entries.FirstOrDefault(e => e.Id == entry.Id);
         RefreshEmptyState();
         ShowStatus("Entry added.");
     }
 
     private void EditEntry(VaultEntryViewModel? vm)
     {
-        if (vm is null) return;
+        if (vm is null || vm.Model.DeletedAt is not null) return;
 
         var editor = new EntryEditorViewModel(vm.Model, SnapshotCategories());
         if (!ShowEditor(editor)) return;
 
-        editor.ApplyTo(vm.Model);
-        _repository.Save();
-        vm.RefreshAll();
+        if (!Commit(d => editor.ApplyTo(d.Entries.Single(e => e.Id == vm.Id)))) return;
         EntriesView.Refresh();
         OnPropertyChanged(nameof(IsEmpty));
         OnPropertyChanged(nameof(EmptyStateText));
@@ -364,13 +371,16 @@ public sealed class VaultViewModel : ObservableObject
         if (vm is null) return;
 
         if (!Dialogs.Confirm(
-                $"Delete \"{vm.Title}\"?\n\nThis cannot be undone.",
+                $"Delete \"{vm.Title}\"?\n\nThis moves the entry to Trash. Deleting it again from Trash is permanent.",
                 "Delete entry"))
             return;
 
-        _repository.Document.Entries.Remove(vm.Model);
-        _repository.Save();
-        Entries.Remove(vm);
+        if (!Commit(d =>
+        {
+            var entry = d.Entries.Single(e => e.Id == vm.Id);
+            if (entry.DeletedAt is not null) d.Entries.Remove(entry);
+            else entry.DeletedAt = DateTimeOffset.UtcNow;
+        })) return;
         if (SelectedEntry == vm) SelectedEntry = null;
         RefreshEmptyState();
         ShowStatus("Entry deleted.");
@@ -378,8 +388,8 @@ public sealed class VaultViewModel : ObservableObject
 
     private void CopyPassword(VaultEntryViewModel? vm)
     {
-        if (vm is null || string.IsNullOrEmpty(vm.Password)) return;
-        _clipboard.SetSecret(vm.Password);
+        if (vm is null || vm.Model.DeletedAt is not null || string.IsNullOrEmpty(vm.Password)) return;
+        if (!_clipboard.SetSecret(vm.Password)) { Dialogs.Error("Clipboard is busy. Try again.", "Copy failed"); return; }
 
         int secs = _settings.Current.ClearClipboardSeconds;
         if (secs > 0) StartCountdown("Password copied", secs);
@@ -388,8 +398,8 @@ public sealed class VaultViewModel : ObservableObject
 
     private void CopyUsername(VaultEntryViewModel? vm)
     {
-        if (vm is null || string.IsNullOrEmpty(vm.Model.Username)) return;
-        _clipboard.SetSecret(vm.Model.Username);
+        if (vm is null || vm.Model.DeletedAt is not null || string.IsNullOrEmpty(vm.Model.Username)) return;
+        if (!_clipboard.SetSecret(vm.Model.Username)) { Dialogs.Error("Clipboard is busy. Try again.", "Copy failed"); return; }
 
         int secs = _settings.Current.ClearClipboardSeconds;
         if (secs > 0) StartCountdown("Username copied", secs);
@@ -399,11 +409,45 @@ public sealed class VaultViewModel : ObservableObject
     private void ToggleFavorite(VaultEntryViewModel? vm)
     {
         if (vm is null) return;
-        vm.Model.IsFavorite = !vm.Model.IsFavorite;
-        vm.Model.UpdatedAt = DateTimeOffset.UtcNow;
-        _repository.Save();
-        vm.RefreshAll();
+        if (!Commit(d => { var e = d.Entries.Single(e => e.Id == vm.Id); e.IsFavorite = !e.IsFavorite; e.UpdatedAt = DateTimeOffset.UtcNow; })) return;
         EntriesView.Refresh();
+    }
+
+    private bool Commit(Action<VaultDocument> edit)
+    {
+        if (_locked) return false;
+        bool success = false;
+        try { _repository.Update(edit); success = true; }
+        catch (Exception ex) when (ex is MyVault.Core.Exceptions.VaultException or System.IO.IOException or UnauthorizedAccessException or InvalidOperationException)
+        { Dialogs.Error("Changes were not saved. The previous vault state was preserved.\n\n" + ex.Message, "Save failed"); }
+        finally
+        {
+            if (!_locked) RefreshCollections();
+        }
+        return success;
+    }
+    private void RefreshCollections()
+    {
+        Guid? selected = SelectedEntry?.Id;
+        Entries.Clear();
+        foreach (var entry in _repository.Document.Entries) Entries.Add(new VaultEntryViewModel(entry));
+        Categories.Clear();
+        foreach (var category in _repository.Document.Categories.OrderBy(c => c.Order))
+            Categories.Add(new CategoryViewModel(category) { IsSelected = _currentFilter == FilterKind.Category && category.Id == SelectedCategoryId });
+        SelectedEntry = Entries.FirstOrDefault(e => e.Id == selected);
+        EntriesView.Refresh(); RefreshEmptyState();
+    }
+    private void RestoreEntry(VaultEntryViewModel? vm)
+    {
+        if (vm is null || vm.Model.DeletedAt is null) return;
+        if (Commit(d => d.Entries.Single(e => e.Id == vm.Id).DeletedAt = null)) ShowStatus("Entry restored.");
+    }
+    private void CopyTotp(VaultEntryViewModel? vm)
+    {
+        if (vm is null || vm.Model.DeletedAt is not null || !MyVault.Core.Services.Totp.IsValid(vm.Model.TotpSecret)) { Dialogs.Info("Add a valid Base32 secret in the entry editor.", "No TOTP secret"); return; }
+        string code = MyVault.Core.Services.Totp.Generate(vm.Model.TotpSecret!, DateTimeOffset.UtcNow);
+        if (_clipboard.SetSecret(code)) ShowStatus("One-time code copied. Valid for " + (30 - DateTimeOffset.UtcNow.ToUnixTimeSeconds() % 30) + "s.");
+        else Dialogs.Error("Clipboard is busy. Try again.", "Copy failed");
     }
 
     // ---------- countdown ----------
@@ -467,14 +511,14 @@ public sealed class VaultViewModel : ObservableObject
             DataContext = editorVm,
             Owner = Application.Current.MainWindow
         };
-        return window.ShowDialog() == true;
+        return window.ShowDialog() == true && !_locked;
     }
 
     private void OpenSettings()
     {
         var vm = new SettingsViewModel(_settings, _repository);
         var window = new SettingsWindow { DataContext = vm, Owner = Application.Current.MainWindow };
-        if (window.ShowDialog() == true)
+        if (window.ShowDialog() == true && !_locked)
         {
             _autoLock.SetIdleTimeout(_settings.Current.AutoLockMinutes);
             _clipboard.ClearSeconds = _settings.Current.ClearClipboardSeconds;
@@ -489,7 +533,7 @@ public sealed class VaultViewModel : ObservableObject
             DataContext = new HealthViewModel(_repository.Document.Entries),
             Owner = Application.Current.MainWindow
         };
-        if (window.ShowDialog() == true && window.SelectedEntry is not null)
+        if (window.ShowDialog() == true && !_locked && window.SelectedEntry is not null)
         {
             var vm = Entries.FirstOrDefault(e => e.Id == window.SelectedEntry.Id);
             if (vm is not null) { SelectedEntry = vm; EditEntry(vm); }
@@ -502,15 +546,16 @@ public sealed class VaultViewModel : ObservableObject
         var vm = new ImportExportViewModel(_repository, backup);
         var window = new ImportExportWindow { DataContext = vm, Owner = Application.Current.MainWindow };
         window.ShowDialog();
+        if (_locked) return;
+        if (window.Restored) RefreshCollections();
 
         if (window.ImportedEntries is { Count: > 0 } imported)
         {
-            foreach (var entry in imported)
+            if (!Commit(d =>
             {
-                _repository.Document.Entries.Add(entry);
-                Entries.Add(new VaultEntryViewModel(entry));
-            }
-            _repository.Save();
+                foreach (var entry in imported)
+                    if (!d.Entries.Any(e => e.DeletedAt is null && string.Equals(e.Title, entry.Title, StringComparison.OrdinalIgnoreCase) && e.Username == entry.Username && e.Url == entry.Url)) d.Entries.Add(entry);
+            })) return;
             RefreshEmptyState();
             EntriesView.Refresh();
         }
@@ -524,9 +569,24 @@ public sealed class VaultViewModel : ObservableObject
 
     private void Lock()
     {
+        if (_locked) return;
+        _locked = true;
+        // Hide secrets before any animation or potentially blocking repository disposal.
+        if (Application.Current.MainWindow is { } main && main.Content is UIElement content) content.Visibility = Visibility.Hidden;
+        foreach (Window window in Application.Current.Windows.Cast<Window>().Where(w => w != Application.Current.MainWindow).ToArray())
+        {
+            window.Visibility = Visibility.Hidden;
+            if (window.DataContext is SettingsViewModel preview) preview.RevertPreview();
+            window.DataContext = null;
+            window.Close();
+        }
+        SelectedEntry = null;
+        Entries.Clear();
+        Categories.Clear();
         StopCountdown();
         _autoLock.TimeToLock -= OnTimeToLock;
         _statusTimer.Stop();
         Locked?.Invoke(this, EventArgs.Empty);
+        if (Application.Current.MainWindow?.Content is UIElement contentAfterLock) contentAfterLock.Visibility = Visibility.Visible;
     }
 }

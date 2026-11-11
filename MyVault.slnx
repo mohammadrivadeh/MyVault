@@ -1,4 +1,6 @@
 <Solution>
   <Project Path="MyVault.App/MyVault.App.csproj" />
   <Project Path="MyVault.Core/MyVault.Core.csproj" />
+  <Project Path="MyVault.Tests/MyVault.Tests.csproj" />
+  <Project Path="MyVault.Windows.Tests/MyVault.Windows.Tests.csproj" />
 </Solution>

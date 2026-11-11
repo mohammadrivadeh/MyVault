@@ -21,7 +21,12 @@ public sealed class SettingsService
         {
             if (!File.Exists(_path)) return new AppSettings();
             string json = File.ReadAllText(_path);
-            return JsonSerializer.Deserialize<AppSettings>(json) ?? new AppSettings();
+            var settings = JsonSerializer.Deserialize<AppSettings>(json) ?? new AppSettings();
+            settings.AutoLockMinutes = Math.Clamp(settings.AutoLockMinutes, 0, 1440);
+            settings.ClearClipboardSeconds = Math.Clamp(settings.ClearClipboardSeconds, 0, 3600);
+            settings.Theme = ThemeService.Normalize(settings.Theme);
+            if (settings.Motion is not ("System" or "Full" or "Off")) settings.Motion = "System";
+            return settings;
         }
         catch
         {
@@ -29,7 +34,7 @@ public sealed class SettingsService
         }
     }
 
-    public void Save()
+    public bool Save()
     {
         try
         {
@@ -43,10 +48,11 @@ public sealed class SettingsService
             string tmp = _path + ".tmp";
             File.WriteAllText(tmp, json);
             File.Move(tmp, _path, overwrite: true);
+            return true;
         }
         catch
         {
-            // Settings are best-effort; never fail the app over this.
+            return false;
         }
     }
 }

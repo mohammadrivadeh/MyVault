@@ -28,33 +28,33 @@ public partial class MessageDialog : GlassWindow
         switch (icon)
         {
             case DialogIcon.Info:
-                IconBubble.Background = new SolidColorBrush(Color.FromRgb(0x1E, 0x2C, 0x4A));
+                IconBubble.SetResourceReference(BackgroundProperty, "App.AccentSubtle");
                 IconGlyph.Text = "\uE946";
-                IconGlyph.Foreground = new SolidColorBrush(Color.FromRgb(0x6B, 0xA6, 0xFF));
+                IconGlyph.SetResourceReference(System.Windows.Controls.TextBlock.ForegroundProperty, "App.Accent");
                 break;
 
             case DialogIcon.Question:
-                IconBubble.Background = new SolidColorBrush(Color.FromRgb(0x1E, 0x2C, 0x4A));
+                IconBubble.SetResourceReference(BackgroundProperty, "App.AccentSubtle");
                 IconGlyph.Text = "\uE897";
-                IconGlyph.Foreground = new SolidColorBrush(Color.FromRgb(0x6B, 0xA6, 0xFF));
+                IconGlyph.SetResourceReference(System.Windows.Controls.TextBlock.ForegroundProperty, "App.Accent");
                 break;
 
             case DialogIcon.Warning:
-                IconBubble.Background = new SolidColorBrush(Color.FromRgb(0x3A, 0x2D, 0x12));
+                IconBubble.SetResourceReference(BackgroundProperty, "App.WarningBg");
                 IconGlyph.Text = "\uE7BA";
-                IconGlyph.Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xD9, 0x7D));
+                IconGlyph.SetResourceReference(System.Windows.Controls.TextBlock.ForegroundProperty, "App.Warning");
                 break;
 
             case DialogIcon.Error:
-                IconBubble.Background = new SolidColorBrush(Color.FromRgb(0x3B, 0x1A, 0x1A));
+                IconBubble.SetResourceReference(BackgroundProperty, "App.ErrorBg");
                 IconGlyph.Text = "\uEA39";
-                IconGlyph.Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0x6B, 0x6B));
+                IconGlyph.SetResourceReference(System.Windows.Controls.TextBlock.ForegroundProperty, "App.Error");
                 break;
 
             case DialogIcon.Success:
-                IconBubble.Background = new SolidColorBrush(Color.FromRgb(0x1A, 0x3A, 0x24));
+                IconBubble.SetResourceReference(BackgroundProperty, "App.WarningBg");
                 IconGlyph.Text = "\uE73E";
-                IconGlyph.Foreground = new SolidColorBrush(Color.FromRgb(0x6B, 0xCB, 0x77));
+                IconGlyph.SetResourceReference(System.Windows.Controls.TextBlock.ForegroundProperty, "App.Success");
                 break;
 
             default:

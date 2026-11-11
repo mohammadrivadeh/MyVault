@@ -27,6 +27,7 @@ public sealed class EntryEditorViewModel : ObservableObject
     private string _notes = string.Empty;
     private string _tagsText = string.Empty;
     private bool _isFavorite;
+    private string _totpSecret = "";
     private Guid? _selectedCategoryId;
     private string? _errorText;
 
@@ -52,12 +53,20 @@ public sealed class EntryEditorViewModel : ObservableObject
             _notes = existing.Notes;
             _tagsText = string.Join(", ", existing.Tags);
             _isFavorite = existing.IsFavorite;
+            _totpSecret = existing.TotpSecret ?? "";
             _selectedCategoryId = existing.CategoryId;
         }
 
         GenerateCommand = new RelayCommand(_ => GeneratePassword());
     }
 
+    public int GeneratorLength { get; set; } = 20;
+    public bool GenerateUpper { get; set; } = true;
+    public bool GenerateLower { get; set; } = true;
+    public bool GenerateDigits { get; set; } = true;
+    public bool GenerateSymbols { get; set; } = true;
+    public bool AvoidAmbiguous { get; set; } = true;
+    public string TotpSecret { get => _totpSecret; set => SetProperty(ref _totpSecret, value); }
     public string WindowTitle => _isNew ? "New" : "Edit";
     public bool IsNew => _isNew;
 
@@ -87,15 +96,20 @@ public sealed class EntryEditorViewModel : ObservableObject
         }
     }
 
-    public string PasswordStrengthLabel => EstimateStrength(_password);
+    public string PasswordStrengthLabel => PasswordStrength.Label(PasswordStrength.Categorize(_password));
 
     public ICommand GenerateCommand { get; }
 
-    private void GeneratePassword() => Password = PasswordGenerator.Generate(length: 20);
+    private void GeneratePassword()
+    {
+        try { Password = PasswordGenerator.Generate(GeneratorLength, GenerateUpper, GenerateLower, GenerateDigits, GenerateSymbols, AvoidAmbiguous); ErrorText = null; }
+        catch (ArgumentException ex) { ErrorText = ex.Message; }
+    }
 
     public string? Validate()
     {
         if (string.IsNullOrWhiteSpace(Title)) return "Title is required.";
+        if (!string.IsNullOrWhiteSpace(TotpSecret) && !Totp.IsValid(TotpSecret)) return "Enter a valid Base32 TOTP secret.";
         return null;
     }
 
@@ -103,6 +117,7 @@ public sealed class EntryEditorViewModel : ObservableObject
     {
         bool passwordChanged = entry.Password != Password;
 
+        entry.TotpSecret = string.IsNullOrWhiteSpace(TotpSecret) ? null : TotpSecret.Replace(" ", "").ToUpperInvariant();
         entry.Title = Title.Trim();
         entry.Username = Username;
         entry.Password = Password;
@@ -120,29 +135,4 @@ public sealed class EntryEditorViewModel : ObservableObject
             entry.PasswordChangedAt = DateTimeOffset.UtcNow;
     }
 
-    private static string EstimateStrength(string pw)
-    {
-        if (string.IsNullOrEmpty(pw)) return string.Empty;
-
-        bool hasLower = pw.Any(char.IsLower);
-        bool hasUpper = pw.Any(char.IsUpper);
-        bool hasDigit = pw.Any(char.IsDigit);
-        bool hasSym = pw.Any(c => !char.IsLetterOrDigit(c));
-
-        int pool = 0;
-        if (hasLower) pool += 26;
-        if (hasUpper) pool += 26;
-        if (hasDigit) pool += 10;
-        if (hasSym) pool += 32;
-        if (pool == 0) pool = 1;
-
-        double bits = pw.Length * Math.Log2(pool);
-        return bits switch
-        {
-            < 40 => "Weak",
-            < 60 => "Fair",
-            < 80 => "Strong",
-            _ => "Very strong"
-        };
-    }
 }

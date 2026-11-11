@@ -6,6 +6,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using MyVault.App.ViewModels;
+using MyVault.App.Services;
 
 namespace MyVault.App.Views;
 
@@ -39,11 +40,17 @@ public partial class UnlockView : UserControl
         _idleTimer.Tick += (_, _) => GoToIdleMode();
 
         Loaded += OnLoaded;
-        Unloaded += (_, _) => _idleTimer.Stop();
+        DataContextChanged += (_, e) =>
+        {
+            if (e.OldValue is UnlockViewModel oldVm) oldVm.PropertyChanged -= OnPasswordReset;
+            if (e.NewValue is UnlockViewModel newVm) newVm.PropertyChanged += OnPasswordReset;
+        };
+        Unloaded += (_, _) => { _idleTimer.Stop(); if (DataContext is UnlockViewModel vm) vm.PropertyChanged -= OnPasswordReset; };
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
+        if (!MotionService.Full) { FinalizeWithoutAnimation(); return; }
         if (_hasAnimatedThisSession)
         {
             Form.Opacity = 1;
@@ -89,6 +96,7 @@ public partial class UnlockView : UserControl
 
     private void GoToIdleMode()
     {
+        if (!MotionService.Full) return;
         if (_isIdleMode) return;
         if (!_hasAnimatedThisSession) return;
 
@@ -466,6 +474,13 @@ public partial class UnlockView : UserControl
     // ================================================================
     //  Password field handlers (unchanged)
     // ================================================================
+
+    private void OnPasswordReset(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (sender is not UnlockViewModel vm) return;
+        if (e.PropertyName == nameof(UnlockViewModel.Password) && vm.Password.Length == 0) PasswordBox.Clear();
+        if (e.PropertyName == nameof(UnlockViewModel.ConfirmPassword) && vm.ConfirmPassword.Length == 0) ConfirmBox.Clear();
+    }
 
     private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
     {

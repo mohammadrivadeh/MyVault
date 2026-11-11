@@ -9,7 +9,7 @@ public sealed class HealthViewModel : ObservableObject
 
     public HealthViewModel(IReadOnlyList<VaultEntry> entries)
     {
-        Report = VaultHealth.Analyze(entries);
+        Report = VaultHealth.Analyze(entries.Where(e => e.DeletedAt is null).ToList());
     }
 
     public string SummaryText

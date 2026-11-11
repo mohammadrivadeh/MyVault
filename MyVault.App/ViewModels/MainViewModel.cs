@@ -9,6 +9,7 @@ public sealed class MainViewModel : ObservableObject
     private readonly ClipboardService _clipboard;
     private readonly SettingsService _settings;
 
+    private bool _shutdown;
     private object? _currentScreen;
     private VaultRepository? _repository;
     private AutoLockService? _autoLock;
@@ -61,11 +62,12 @@ public sealed class MainViewModel : ObservableObject
             StringComparison.OrdinalIgnoreCase);
 
         _settings.Current.LastVaultPath = isDefault ? null : newPath;
-        _settings.Save();
+        if (!_settings.Save()) Dialogs.Warning("The vault path could not be remembered. You may need to choose it again next time.", "Settings not saved");
     }
 
     private void OnUnlocked(object? sender, VaultRepository repo)
     {
+        if (_shutdown) { repo.Dispose(); return; }
         if (sender is UnlockViewModel vm)
         {
             vm.Unlocked -= OnUnlocked;
@@ -100,8 +102,11 @@ public sealed class MainViewModel : ObservableObject
         _clipboard.ClearNow();
     }
 
+    public void InitializeClipboard(System.Windows.Window owner) => _clipboard.Initialize(owner);
+
     public void Shutdown()
     {
+        _shutdown = true;
         CleanupVaultSession();
         try { _clipboard.Dispose(); } catch { /* ignore */ }
     }

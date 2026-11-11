@@ -5,39 +5,17 @@ namespace MyVault.App.Services;
 public static class ThemeService
 {
     public const string MoonlightGlow = "MoonlightGlow";
-
+    public static IReadOnlyList<string> Themes { get; } = new[] { MoonlightGlow, "Graphite", "Nord", "Forest", "Ivory", "HighContrast" };
+    private static ResourceDictionary? _palette;
+    private static string _current = MoonlightGlow;
+    public static string Normalize(string? theme) => Themes.Contains(theme ?? "") ? theme! : MoonlightGlow;
+    public static bool IsDarkActive() => _current != "Ivory";
     public static void Apply(string? theme)
     {
-        var app = Application.Current;
-        if (app is null) return;
-
-        var merged = app.Resources.MergedDictionaries;
-
-        // Remove any existing theme dictionaries by name.
-        for (int i = merged.Count - 1; i >= 0; i--)
-        {
-            var src = merged[i].Source?.OriginalString;
-            if (src is null) continue;
-            if (src.EndsWith("Light.xaml", StringComparison.OrdinalIgnoreCase) ||
-                src.EndsWith("Dark.xaml", StringComparison.OrdinalIgnoreCase) ||
-                src.EndsWith("MoonlightGlow.xaml", StringComparison.OrdinalIgnoreCase))
-            {
-                merged.RemoveAt(i);
-            }
-        }
-
-        merged.Add(new ResourceDictionary
-        {
-            Source = new Uri("Themes/MoonlightGlow.xaml", UriKind.Relative)
-        });
+        if (Application.Current is not { } app) return;
+        _current = Normalize(theme);
+        if (_palette is not null) app.Resources.MergedDictionaries.Remove(_palette);
+        _palette = new ResourceDictionary { Source = new Uri("/MyVault.App;component/Themes/" + _current + "Palette.xaml", UriKind.RelativeOrAbsolute) };
+        app.Resources.MergedDictionaries.Add(_palette);
     }
-
-    public static bool IsDarkActive()
-    {
-        // Moonlight Glow is the only theme, and it's dark.
-        return true;
-    }
-
-    /// <summary>Forces any incoming value to MoonlightGlow (for old settings.json migration).</summary>
-    public static string Normalize(string? theme) => MoonlightGlow;
 }

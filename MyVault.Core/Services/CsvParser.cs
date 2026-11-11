@@ -63,6 +63,7 @@ public static class CsvParser
             else { field.Append(c); i++; }
         }
 
+        if (inQuotes) throw new InvalidDataException("Unterminated quoted CSV field.");
         if (field.Length > 0 || row.Count > 0)
             EndRow();
 

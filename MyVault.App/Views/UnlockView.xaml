@@ -160,7 +160,9 @@
                             </Grid>
                         </Border>
 
-                        <Border x:Name="FormError"
+                        <Button Content="Create another vault…" Command="{Binding CreateVaultCommand}" Margin="0,8,0,0"/>
+
+                <Border x:Name="FormError"
                                 Background="{DynamicResource App.ErrorBg}"
                                 CornerRadius="8" Padding="10,8" Margin="0,12,0,0"
                                 Visibility="{Binding ErrorText, Converter={StaticResource NullOrEmptyToVis}}">
@@ -196,9 +198,9 @@
                                     Margin="0,8,0,0"
                                     Padding="16,6"
                                     FontSize="12"
-                                    Foreground="#FF6B81"
+                                    Foreground="{DynamicResource App.Error}"
                                     Background="Transparent"
-                                    BorderBrush="#FF6B81"
+                                    BorderBrush="{DynamicResource App.Error}"
                                     BorderThickness="1"
                                     Cursor="Hand">
                                 <Button.Template>
@@ -213,10 +215,10 @@
                                         </Border>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter TargetName="Bd" Property="Background" Value="#33FF6B81"/>
+                                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource App.ErrorBg}"/>
                                             </Trigger>
                                             <Trigger Property="IsPressed" Value="True">
-                                                <Setter TargetName="Bd" Property="Background" Value="#55FF6B81"/>
+                                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource App.ErrorBg}"/>
                                             </Trigger>
                                         </ControlTemplate.Triggers>
                                     </ControlTemplate>
