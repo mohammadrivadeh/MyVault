@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net10.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UseWPF>true</UseWPF>
+		<ApplicationIcon>Assets\Application.ico</ApplicationIcon>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Content Include="Assets\Application.ico" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<Resource Include="Assets\Application.png" />
+		<Resource Include="Assets\Application.ico" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\MyVault.Core\MyVault.Core.csproj" />
+	</ItemGroup>
+
+</Project>

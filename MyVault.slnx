@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="MyVault.App/MyVault.App.csproj" />
+  <Project Path="MyVault.Core/MyVault.Core.csproj" />
+</Solution>

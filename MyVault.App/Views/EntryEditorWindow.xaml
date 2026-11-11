@@ -1,0 +1,146 @@
+﻿<views:GlassWindow x:Class="MyVault.App.Views.EntryEditorWindow"
+                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   xmlns:vm="clr-namespace:MyVault.App.ViewModels"
+                   xmlns:views="clr-namespace:MyVault.App.Views"
+                   mc:Ignorable="d"
+                   d:DataContext="{d:DesignInstance Type=vm:EntryEditorViewModel}"
+                   Title="{Binding WindowTitle}"
+                   Width="560" Height="640">
+
+    <Border Background="{DynamicResource App.Background}"
+            BorderBrush="{DynamicResource App.BorderGlass}"
+            BorderThickness="1"
+            CornerRadius="14">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="40" ShadowDepth="8" Opacity="0.35" Color="#000000"/>
+        </Border.Effect>
+
+        <Grid Margin="24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="{Binding WindowTitle}"
+                       FontSize="16" FontWeight="SemiBold"
+                       Foreground="{DynamicResource App.Text}"
+                       Margin="0,0,0,16"/>
+
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="14"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Row 0: Title | Username -->
+                    <StackPanel Grid.Row="0" Grid.Column="0">
+                        <TextBlock Text="Title *" FontSize="11" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource App.TextMuted}" Margin="0,0,0,4"/>
+                        <TextBox x:Name="TitleBox"
+                                 Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="0" Grid.Column="2">
+                        <TextBlock Text="Username" FontSize="11" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource App.TextMuted}" Margin="0,0,0,4"/>
+                        <TextBox Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+
+                    <!-- Row 1: Password (full width) -->
+                    <StackPanel Grid.Row="1" Grid.ColumnSpan="3" Margin="0,12,0,0">
+                        <TextBlock Text="Password" FontSize="11" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource App.TextMuted}" Margin="0,0,0,4"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0">
+                                <PasswordBox x:Name="PwdBox" Padding="10,8,38,8"
+                                             PasswordChanged="PwdBox_PasswordChanged"/>
+                                <TextBox x:Name="RevealBox" Visibility="Collapsed"
+                                         Padding="10,8,38,8"
+                                         TextChanged="RevealBox_TextChanged"/>
+                                <Button Style="{StaticResource GhostButton}"
+                                        Width="28" Height="28" Padding="0"
+                                        HorizontalAlignment="Right" VerticalAlignment="Center"
+                                        Margin="4,4,4,4"
+                                        Click="ToggleReveal_Click"
+                                        ToolTip="Show / hide password">
+                                    <TextBlock Text="  👁" FontSize="14"/>
+                                </Button>
+                            </Grid>
+                            <Button Grid.Column="1" Content="Generate"
+                                    Margin="6,0,0,0"
+                                    Command="{Binding GenerateCommand}"/>
+                        </Grid>
+                        <TextBlock Text="{Binding PasswordStrengthLabel}"
+                                   FontSize="11" Foreground="{DynamicResource App.TextMuted}"
+                                   Margin="0,4,0,0"/>
+                    </StackPanel>
+
+                    <!-- Row 2: URL | Category -->
+                    <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,12,0,0">
+                        <TextBlock Text="URL" FontSize="11" FontWeight="SemiBold"
+               Foreground="{DynamicResource App.TextMuted}" Margin="0,0,0,4"/>
+                        <TextBox Text="{Binding Url, UpdateSourceTrigger=PropertyChanged}"
+             Height="50"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2" Grid.Column="2" Margin="0,12,0,0">
+                        <TextBlock Text="Category" FontSize="11" FontWeight="SemiBold"
+               Foreground="{DynamicResource App.TextMuted}" Margin="0,0,0,4"/>
+                        <ComboBox ItemsSource="{Binding CategoryOptions}"
+              SelectedValue="{Binding SelectedCategoryId, Mode=TwoWay}"
+              SelectedValuePath="Id"
+              DisplayMemberPath="Name"
+              Height="50"
+              VerticalContentAlignment="Center"
+              Padding="10,0"/>
+                    </StackPanel>
+
+                    <!-- Row 3: Tags (full width) -->
+                    <StackPanel Grid.Row="3" Grid.ColumnSpan="3" Margin="0,12,0,0">
+                        <TextBlock Text="Tags (comma‑separated)" FontSize="11" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource App.TextMuted}" Margin="0,0,0,4"/>
+                        <TextBox Text="{Binding TagsText, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+
+                    <!-- Row 4: Notes (full width) -->
+                    <StackPanel Grid.Row="4" Grid.ColumnSpan="3" Margin="0,12,0,0">
+                        <TextBlock Text="Notes" FontSize="11" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource App.TextMuted}" Margin="0,0,0,4"/>
+                        <TextBox Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}"
+                                 AcceptsReturn="True" TextWrapping="Wrap"
+                                 Height="80" VerticalScrollBarVisibility="Auto"/>
+                    </StackPanel>
+                </Grid>
+            </ScrollViewer>
+
+            <Grid Grid.Row="2" Margin="0,16,0,0">
+                <CheckBox Content="Mark as favorite" IsChecked="{Binding IsFavorite}"
+                          HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock Text="{Binding ErrorText}" Foreground="{DynamicResource App.Error}"
+                               VerticalAlignment="Center" Margin="0,0,12,0" TextWrapping="Wrap" MaxWidth="220"/>
+                    <Button Content="Cancel" Click="Cancel_Click" IsCancel="True" Margin="0,0,8,0"/>
+                    <Button Content="Save" Click="Save_Click" IsDefault="True"
+                            Style="{StaticResource PrimaryButton}"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</views:GlassWindow>

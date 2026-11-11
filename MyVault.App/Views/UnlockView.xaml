@@ -1,0 +1,246 @@
+﻿<UserControl x:Class="MyVault.App.Views.UnlockView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:MyVault.App.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:UnlockViewModel}">
+
+    <Grid Background="{DynamicResource App.Background}">
+
+        <Border x:Name="Card"
+                Width="440" Padding="32,28,32,24"
+                Margin="0"
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                Background="{DynamicResource App.SurfaceGlass}"
+                BorderBrush="{DynamicResource App.BorderGlass}"
+                BorderThickness="1"
+                CornerRadius="16">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="40" ShadowDepth="8" Direction="270" Opacity="0.28" Color="#000000"/>
+            </Border.Effect>
+
+            <Grid>
+                <!-- Main content -->
+                <StackPanel>
+                    <!-- Hero -->
+                    <StackPanel x:Name="Hero">
+                        <StackPanel.RenderTransform>
+                            <TranslateTransform x:Name="HeroTransform" Y="0"/>
+                        </StackPanel.RenderTransform>
+
+                        <Grid Width="88" Height="88" HorizontalAlignment="Center" Margin="0,0,0,14">
+                            <!-- Glow ring 1 — behind logo, starts first -->
+                            <Border x:Name="GlowRing1"
+            Width="88" Height="88" CornerRadius="20"
+            Background="{DynamicResource App.Accent}"
+            Opacity="0"
+            IsHitTestVisible="False"
+            RenderTransformOrigin="0.5,0.5">
+                                <Border.RenderTransform>
+                                    <ScaleTransform x:Name="GlowRing1Scale" ScaleX="1" ScaleY="1"/>
+                                </Border.RenderTransform>
+                            </Border>
+
+                            <!-- Glow ring 2 — behind logo, offset by half a cycle for continuous wave -->
+                            <Border x:Name="GlowRing2"
+            Width="88" Height="88" CornerRadius="20"
+            Background="{DynamicResource App.Accent}"
+            Opacity="0"
+            IsHitTestVisible="False"
+            RenderTransformOrigin="0.5,0.5">
+                                <Border.RenderTransform>
+                                    <ScaleTransform x:Name="GlowRing2Scale" ScaleX="1" ScaleY="1"/>
+                                </Border.RenderTransform>
+                            </Border>
+
+                            <!-- Actual logo (in front, covers the rings when they're at scale 1.0) -->
+                            <Border Width="88" Height="88" CornerRadius="20"
+            Background="{DynamicResource App.AccentSubtle}">
+                                <Image Source="/Assets/Application.png"
+               Width="60" Height="60"
+               Stretch="Uniform"
+               RenderOptions.BitmapScalingMode="HighQuality"/>
+                            </Border>
+                        </Grid>
+
+                        <TextBlock Text="MyVault"
+                                   FontFamily="{StaticResource App.FontFamily}"
+                                   FontSize="24" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource App.Text}"
+                                   HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding Subtitle}"
+                                   FontFamily="{StaticResource App.FontFamily}"
+                                   FontSize="12"
+                                   Foreground="{DynamicResource App.TextMuted}"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,4,0,20"/>
+                    </StackPanel>
+
+                    <!-- Form -->
+                    <StackPanel x:Name="Form">
+                        <StackPanel x:Name="FormPassword">
+                            <TextBlock Text="Master password"
+                                       FontSize="11" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource App.TextMuted}"
+                                       Margin="2,0,0,4"/>
+                            <PasswordBox x:Name="PasswordBox"
+                                         PasswordChanged="PasswordBox_PasswordChanged"
+                                         KeyDown="PasswordBox_KeyDown"/>
+                        </StackPanel>
+
+                        <StackPanel x:Name="FormCreateExtras"
+                                    Visibility="{Binding IsCreateMode, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="Confirm master password"
+                                       FontSize="11" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource App.TextMuted}"
+                                       Margin="2,12,0,4"/>
+                            <PasswordBox x:Name="ConfirmBox"
+                                         PasswordChanged="ConfirmBox_PasswordChanged"
+                                         KeyDown="ConfirmBox_KeyDown"/>
+
+                            <Border Background="{DynamicResource App.WarningBg}"
+                                    CornerRadius="8" Padding="12,10" Margin="0,12,0,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="⚠" FontSize="16"
+                                               Foreground="{DynamicResource App.Warning}"
+                                               VerticalAlignment="Top" Margin="0,0,8,0"/>
+                                    <TextBlock TextWrapping="Wrap" FontSize="12"
+                                               Foreground="{DynamicResource App.Warning}"
+                                               MaxWidth="340">
+                                        No password recovery. If you forget this password,
+                                        your vault cannot be opened by anyone — including you.
+                                        Write it down and store it somewhere safe.
+                                    </TextBlock>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <Border x:Name="FormVaultPicker"
+                                Background="{DynamicResource App.SurfaceGlassAlt}"
+                                BorderBrush="{DynamicResource App.BorderGlass}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="12,8"
+                                Margin="0,14,0,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Text="Vault file"
+                                               FontSize="10" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource App.TextDisabled}"
+                                               Margin="0,0,0,2"/>
+                                    <TextBlock Text="{Binding VaultDisplay}"
+                                               FontSize="12" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource App.Text}"
+                                               TextTrimming="CharacterEllipsis"
+                                               ToolTip="{Binding CurrentVaultPath}"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+                                    <Button Content="Change…"
+                                            Command="{Binding ChooseVaultCommand}"
+                                            Style="{StaticResource GhostButton}"
+                                            Padding="8,4" FontSize="11"/>
+                                    <Button Content="Use default"
+                                            Command="{Binding UseDefaultVaultCommand}"
+                                            Style="{StaticResource GhostButton}"
+                                            Padding="8,4" FontSize="11"
+                                            Margin="2,0,0,0"
+                                            Foreground="{DynamicResource App.Accent}"
+                                            Visibility="{Binding IsCustomVault, Converter={StaticResource BoolToVis}}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Border x:Name="FormError"
+                                Background="{DynamicResource App.ErrorBg}"
+                                CornerRadius="8" Padding="10,8" Margin="0,12,0,0"
+                                Visibility="{Binding ErrorText, Converter={StaticResource NullOrEmptyToVis}}">
+                            <TextBlock Text="{Binding ErrorText}"
+                                       FontSize="12"
+                                       Foreground="{DynamicResource App.Error}"
+                                       TextWrapping="Wrap"/>
+                        </Border>
+
+                        <StackPanel x:Name="FormButtons">
+                            <Grid Margin="0,18,0,0">
+                                <Button Content="{Binding ButtonText}"
+                                        Command="{Binding UnlockCommand}"
+                                        Style="{StaticResource PrimaryButton}"
+                                        Height="42" FontSize="14"
+                                        IsDefault="True"/>
+
+                                <Border Background="{DynamicResource App.SurfaceGlass}"
+                                        CornerRadius="6" Padding="14,6"
+                                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="⏳" FontSize="13" Margin="0,0,6,0"/>
+                                        <TextBlock Text="Deriving key…" FontSize="12"
+                                                   Foreground="{DynamicResource App.TextMuted}"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <Button Content="Close application"
+                                    Command="{Binding CloseAppCommand}"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,8,0,0"
+                                    Padding="16,6"
+                                    FontSize="12"
+                                    Foreground="#FF6B81"
+                                    Background="Transparent"
+                                    BorderBrush="#FF6B81"
+                                    BorderThickness="1"
+                                    Cursor="Hand">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="Bd"
+                                                Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                CornerRadius="6"
+                                                Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Bd" Property="Background" Value="#33FF6B81"/>
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Setter TargetName="Bd" Property="Background" Value="#55FF6B81"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Click-to-continue overlay (idle state) -->
+                <TextBlock x:Name="ClickToContinueText"
+                           Text="Click to continue"
+                           FontFamily="{StaticResource App.FontFamily}"
+                           FontSize="12"
+                           Foreground="{DynamicResource App.TextMuted}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Top"
+                           Opacity="0"
+                           IsHitTestVisible="False">
+                    <TextBlock.RenderTransform>
+                        <TranslateTransform x:Name="ClickToContinueTransform" Y="0"/>
+                    </TextBlock.RenderTransform>
+                </TextBlock>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
