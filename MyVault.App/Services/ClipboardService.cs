@@ -12,7 +12,9 @@ public sealed class ClipboardService : IDisposable
     [DllImport("user32.dll")] private static extern bool CloseClipboard();
     [DllImport("user32.dll")] private static extern bool EmptyClipboard();
     [DllImport("user32.dll")] private static extern IntPtr SetClipboardData(uint format, IntPtr memory);
-    [DllImport("user32.dll")] private static extern uint GetClipboardSequenceNumber();
+    [DllImport("user32.dll")] private static extern IntPtr GetClipboardOwner();
+    [DllImport("user32.dll")] private static extern IntPtr GetClipboardData(uint format);
+    [DllImport("kernel32.dll")] private static extern UIntPtr GlobalSize(IntPtr memory);
     [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern uint RegisterClipboardFormat(string name);
     [DllImport("kernel32.dll")] private static extern IntPtr GlobalAlloc(uint flags, UIntPtr size);
     [DllImport("kernel32.dll")] private static extern IntPtr GlobalLock(IntPtr memory);
@@ -20,7 +22,8 @@ public sealed class ClipboardService : IDisposable
     [DllImport("kernel32.dll")] private static extern IntPtr GlobalFree(IntPtr memory);
     private readonly DispatcherTimer _timer = new();
     private IntPtr _owner;
-    private uint? _sequence;
+    private byte[]? _generation;
+    private readonly uint _markerFormat=RegisterClipboardFormat("MyVault.ClipboardGeneration");
     public int ClearSeconds { get; set; }
     public ClipboardService(int seconds)
     {
@@ -32,9 +35,12 @@ public sealed class ClipboardService : IDisposable
     {
         if (_owner == IntPtr.Zero || string.IsNullOrEmpty(value) || !OpenClipboard(_owner)) return false;
         bool success = false;
+        byte[] generation=Guid.NewGuid().ToByteArray();
         try
         {
             if (!EmptyClipboard()) return false;
+            _generation=null;
+            Put(_markerFormat,generation);
             // All formats are published while holding the clipboard, before another process can read them.
             PutFlag("CanIncludeInClipboardHistory", 0);
             PutFlag("CanUploadToCloudClipboard", 0);
@@ -44,7 +50,8 @@ public sealed class ClipboardService : IDisposable
             finally { System.Security.Cryptography.CryptographicOperations.ZeroMemory(bytes); }
         }
         catch (InvalidOperationException) { EmptyClipboard(); }
-        finally { _sequence = GetClipboardSequenceNumber(); CloseClipboard(); }
+        finally { CloseClipboard(); }
+        _generation=success ? generation : null;
         _timer.Stop();
         if (success && ClearSeconds > 0) { _timer.Interval = TimeSpan.FromSeconds(ClearSeconds); _timer.Start(); }
         return success;
@@ -52,10 +59,26 @@ public sealed class ClipboardService : IDisposable
     public void ClearNow()
     {
         _timer.Stop();
-        if (_sequence is not uint sequence) return;
+        if (_generation is null) return;
         if (!OpenClipboard(_owner)) { _timer.Interval = TimeSpan.FromSeconds(1); _timer.Start(); return; }
-        try { if (GetClipboardSequenceNumber() != sequence || EmptyClipboard()) _sequence = null; else { _timer.Interval = TimeSpan.FromSeconds(1); _timer.Start(); } }
+        try
+        {
+            // A private random marker survives Windows format conversion, unlike the sequence counter.
+            // Compare under the clipboard lock so another application's new copy cannot be cleared.
+            if(!OwnsGeneration() || EmptyClipboard()) _generation=null;
+            else {_timer.Interval=TimeSpan.FromSeconds(1); _timer.Start();}
+        }
         finally { CloseClipboard(); }
+    }
+    private bool OwnsGeneration()
+    {
+        if(GetClipboardOwner()!=_owner || _generation is null) return false;
+        IntPtr memory=GetClipboardData(_markerFormat);
+        if(memory==IntPtr.Zero || GlobalSize(memory).ToUInt64()!=16) return false;
+        IntPtr pointer=GlobalLock(memory);
+        if(pointer==IntPtr.Zero) return false;
+        try {byte[] marker=new byte[16]; Marshal.Copy(pointer,marker,0,16); return marker.AsSpan().SequenceEqual(_generation);}
+        finally {GlobalUnlock(memory);}
     }
     public void Dispose() { ClearNow(); _timer.Stop(); }
     private static void PutFlag(string name, int value) => Put(RegisterClipboardFormat(name), BitConverter.GetBytes(value));
