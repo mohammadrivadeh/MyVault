@@ -9,13 +9,13 @@ jobs:
   core:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
         with:
           dotnet-version: '10.0.x'
       - run: dotnet restore MyVault.Tests/MyVault.Tests.csproj --locked-mode
       - run: dotnet test MyVault.Tests/MyVault.Tests.csproj -c Release --no-restore --logger trx
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         if: always()
         with:
           name: core-test-results
@@ -23,15 +23,26 @@ jobs:
   windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
         with:
           dotnet-version: '10.0.x'
       - run: dotnet restore MyVault.slnx --locked-mode
       - run: dotnet build MyVault.slnx -c Release --no-restore
       - run: dotnet test MyVault.Windows.Tests/MyVault.Windows.Tests.csproj -c Release --no-build --logger trx
+      - name: Report desktop test failures
+        if: failure()
+        shell: pwsh
+        run: |
+          Get-ChildItem -Recurse -Filter *.trx | ForEach-Object {
+            [xml]$result = Get-Content $_.FullName
+            $result.SelectNodes("//*[local-name()='ErrorInfo']") | ForEach-Object {
+              $message = ($_.InnerText -replace '%', '%25' -replace "`r", '%0D' -replace "`n", '%0A')
+              Write-Output "::error title=Desktop test failure::$message"
+            }
+          }
       - run: dotnet publish MyVault.App/MyVault.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o artifacts/MyVault-win-x64
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         if: always()
         with:
           name: windows-results-and-build
