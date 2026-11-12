@@ -18,3 +18,7 @@ CI runs Linux core tests and Windows build/STA integration/publish. The first ru
 Successful run: https://github.com/mohammadrivadeh/MyVault/actions/runs/43122194177 — Linux core/design job succeeded (21 cases); Windows build, STA integration scenario and self-contained publish job succeeded. This is remote Windows execution evidence, separate from Linux cross-compilation.
 
 Manual DPI/visual, Windows-session-switch, external-app clipboard-history and clean-machine release checks remain required before public distribution. Automated tests do not replace a security audit or those checks. No real vault data was used.
+
+## Compact row actions and guided authenticator setup follow-up
+
+Code commit `5ea2637` passed Linux and Windows CI: https://github.com/mohammadrivadeh/MyVault/actions/runs/43125037667 . The Windows integration scenario now renders the actual vault list at 900-unit width, copies a six-digit code using the bound row button, restores a deleted entry using its row button, and still checks clipboard ownership and modal locking. Setup validation rejects a six-digit code pasted as a setup key and accepts a valid Base32 key. The right details panel was removed, and the editor now includes five-step guidance with a Persian companion guide. Publish succeeded in the same Windows run. Earlier executable checksums above describe the original feature delivery, not this follow-up.

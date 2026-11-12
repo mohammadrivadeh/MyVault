@@ -12,7 +12,7 @@
 - Local RFC 6238 TOTP and creation of separate vault files.
 - Verified encrypted backup restoration and duplicate-skipping CSV import.
 - Portable regression/contrast tests and Windows STA integration CI.
-- Architecture, security/user/development guides and four ADRs.
+- Architecture, security/user/development guides and five ADRs.
 
 ### Fixed
 
