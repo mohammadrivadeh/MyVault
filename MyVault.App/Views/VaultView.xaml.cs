@@ -15,7 +15,6 @@ public partial class VaultView : UserControl
     public VaultView()
     {
         InitializeComponent();
-        SizeChanged += (_, _) => DetailsPanel.Visibility = ActualWidth >= 1050 ? Visibility.Visible : Visibility.Collapsed;
         // Hide elements before first render (safe — null-checked)
         HideAll();
 

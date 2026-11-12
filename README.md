@@ -7,8 +7,8 @@ A portable Windows password vault built with .NET 10 and WPF. Vault contents sta
 - Entries, categories, favorites, tags and search (`Ctrl+K` / `Ctrl+F`).
 - Six color palettes: MoonlightGlow, Graphite, Nord, Forest, Ivory and HighContrast.
 - Live theme preview with Cancel rollback; System / Full / Off motion settings respecting Windows reduced motion.
-- Entry details on wide windows, sorting, Weak / Reused / Recent views and encrypted Trash with manual restore/permanent deletion.
-- Configurable cryptographic password generator and optional local TOTP (SHA-1, six digits, 30 seconds).
+- Compact per-entry action icons, sorting, Weak / Reused / Recent views and encrypted Trash with manual restore/permanent deletion.
+- Configurable cryptographic password generator and guided optional two-step verification (TOTP: SHA-1, six digits, 30 seconds).
 - Separate vault files; create or choose another vault from the unlock screen.
 - Encrypted backup export and verified restore for backups using the current key.
 - CSV import with alias support and duplicate skipping; explicit plaintext export warnings.
@@ -30,4 +30,4 @@ The application and desktop tests require Windows. Linux supports core tests and
 
 ## فارسی
 
-MyVault یک مدیر رمز عبور محلی برای ویندوز است. این نسخه تم‌های متنوع، تنظیم حرکت، پنل جزئیات، تولید رمز قابل‌تنظیم، TOTP، سطل بازیافت و بازیابی بکاپ دارد. اطلاعات Vault رمزگذاری می‌شوند؛ فایل CSV رمزگذاری نمی‌شود. قبل از ارتقا از Vault خود بکاپ بگیرید. اجرای رابط و تست‌های دسکتاپ به ویندوز نیاز دارد.
+MyVault یک مدیر رمز عبور محلی برای ویندوز است. این نسخه تم‌های متنوع، تنظیم حرکت، آیکون‌های عملیات هر ردیف، تولید رمز قابل‌تنظیم، TOTP، سطل بازیافت و بازیابی بکاپ دارد. اطلاعات Vault رمزگذاری می‌شوند؛ فایل CSV رمزگذاری نمی‌شود. قبل از ارتقا از Vault خود بکاپ بگیرید. اجرای رابط و تست‌های دسکتاپ به ویندوز نیاز دارد. برای راه‌اندازی کد دومرحله‌ای، [راهنمای فارسی قدم‌به‌قدم](docs/fa/TOTP.md) را ببینید.

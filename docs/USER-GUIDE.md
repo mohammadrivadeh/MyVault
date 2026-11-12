@@ -8,15 +8,25 @@ Use a writable portable application folder. The default vault and settings live 
 
 ## Appearance
 
-Settings offers six palettes with immediate preview. Save retains the choice; Cancel restores the previous palette. System mode uses short transitions when Windows enables animation. Full additionally enables the decorative unlock intro. Off disables those transitions. Windows reduced-motion preference takes priority over all modes. Details appear at widths of at least 1050 device-independent units; narrow windows retain the entry editor and row actions.
+Settings offers six palettes with immediate preview. Save retains the choice; Cancel restores the previous palette. System mode uses short transitions when Windows enables animation. Full additionally enables the decorative unlock intro. Off disables those transitions. Windows reduced-motion preference takes priority over all modes. All entry actions are available directly on each row at every window width; there is no separate details panel. Double-click or use the edit icon to view and edit entry fields.
 
 ## Entries
 
 Use Title, Updated or Created sorting. Smart views show weak passwords, reused passwords, entries changed in the last 30 days, or Trash. Strength labels are estimates, not proof a password is unguessable. Generate opens options for length, classes and ambiguous characters. At least one class must be enabled.
 
-Deleting an active entry moves it to Trash. Select it in Trash and use Restore from Trash. Delete again for permanent removal after confirmation. There is no automatic expiration in this version; old encrypted backups can still contain removed entries.
+Deleting an active entry moves it to Trash. Use the Restore from Trash icon on its row. Delete again for permanent removal after confirmation. There is no automatic expiration in this version; old encrypted backups can still contain removed entries.
 
-Optional TOTP accepts a Base32 secret for SHA-1 / six digits / 30-second accounts. Copy one-time code from the details panel. On narrow windows, widen the window to use that action. It uses the computer's clock; keep Windows time synchronized. Secret import from QR/otpauth URLs and other algorithms is not included.
+TOTP means a time-based one-time password: a six-digit two-step verification code that changes every 30 seconds, like Google Authenticator. It is generated locally from the account’s setup key, not delivered by SMS. The optional field accepts a Base32 secret for SHA-1 / six digits / 30-second accounts. Copy the code using the clock icon on the entry row; this icon appears only when the entry has a valid key. It uses the computer's clock; keep Windows time synchronized. Secret import from QR/otpauth URLs and other algorithms is not included.
+
+### Set up an authenticator key
+
+1. On the website, open Security → Two-step verification / 2FA and select Authenticator app.
+2. Next to its QR code, choose Can't scan? / Enter key manually and copy the longer setup key.
+3. In MyVault's entry editor, expand Two-step verification and paste that key in step 3. Do not paste a six-digit login code, account password, QR image or otpauth link. Inline feedback explains these mistakes.
+4. Save the entry, use its clock icon to copy a code, and enter that code on the website to complete activation. Local key-format acceptance and saving alone do not enable 2FA on the website.
+5. Keep the website's recovery codes safely outside this vault. Removing a key in MyVault does not disable the website's 2FA; prepare an alternative authenticator or recovery method first.
+
+[راهنمای فارسی قدم‌به‌قدم](fa/TOTP.md)
 
 ## Backup and import
 

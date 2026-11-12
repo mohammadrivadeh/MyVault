@@ -138,9 +138,32 @@
                         <TextBox Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}"
                                  AcceptsReturn="True" TextWrapping="Wrap"
                                  Height="80" VerticalScrollBarVisibility="Auto"/>
-                        <TextBlock Text="TOTP secret (Base32; SHA-1 / 6 digits / 30 seconds)" TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}" Margin="0,12,0,4"/>
-                        <PasswordBox x:Name="TotpBox" PasswordChanged="TotpBox_PasswordChanged"/>
-                        <TextBlock Text="Stored encrypted with this vault. Keep a separate recovery method." TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}" Margin="0,4,0,0"/>
+                        <Expander Margin="0,16,0,0" Foreground="{DynamicResource App.Text}">
+                            <Expander.Header>
+                                <StackPanel>
+                                    <TextBlock Text="Two-step verification" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding TotpSetupStatus}" FontSize="11" Foreground="{DynamicResource App.TextMuted}" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Expander.Header>
+                            <Border Background="{DynamicResource App.SurfaceAlt}" BorderBrush="{DynamicResource App.Border}" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,8,0,0">
+                                <StackPanel>
+                                    <TextBlock Text="Use MyVault like an authenticator" FontWeight="SemiBold"/>
+                                    <TextBlock Text="Generate a 6-digit login code that changes every 30 seconds. No SMS or internet connection is needed." TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}" Margin="0,4,0,12"/>
+                                    <TextBlock Text="1. Start on the website" FontWeight="SemiBold"/>
+                                    <TextBlock Text="Open the account's Security settings → Two-step verification / 2FA. Choose Authenticator app, not SMS." TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}" Margin="0,4,0,12"/>
+                                    <TextBlock Text="2. Get the manual setup key" FontWeight="SemiBold"/>
+                                    <TextBlock Text="Beside the QR code, choose Can't scan? / Enter key manually and copy the longer setup key. MyVault does not scan QR images yet." TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}" Margin="0,4,0,12"/>
+                                    <TextBlock Text="3. Paste that key here" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                    <PasswordBox x:Name="TotpBox" PasswordChanged="TotpBox_PasswordChanged" AutomationProperties.Name="Authenticator manual setup key" ToolTip="Paste the Base32 setup key, not a 6-digit code"/>
+                                    <TextBlock Text="{Binding TotpSetupHint}" TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}" Margin="0,6,0,12"/>
+                                    <TextBlock Text="4. Save, copy a code, and confirm" FontWeight="SemiBold"/>
+                                    <TextBlock Text="Save this entry in MyVault. Click its clock icon to copy a code, paste it into the website's verification field, then confirm on the website. Saving a key here alone does not turn on 2FA." TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}" Margin="0,4,0,12"/>
+                                    <TextBlock Text="5. Keep a recovery method" FontWeight="SemiBold"/>
+                                    <TextBlock Text="Store the website's recovery codes somewhere safe outside this vault. Password and authenticator key stored together share the same vault protection." TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}" Margin="0,4,0,12"/>
+                                    <TextBlock Text="Later logins: use your password, then the clock icon for a fresh code. If a code is rejected, wait for the next one and check Windows time. Supported: SHA-1 · 6 digits · 30 seconds." TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}"/>
+                                </StackPanel>
+                            </Border>
+                        </Expander>
                     </StackPanel>
                 </Grid>
             </ScrollViewer>

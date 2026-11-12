@@ -16,7 +16,6 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="210"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
         <!-- ========== SIDEBAR ========== -->
@@ -342,12 +341,14 @@
                                             </StackPanel>
                                         </StackPanel>
 
-                                        <!-- Action buttons: copy user | copy pass | edit | delete -->
+                                        <!-- Contextual row actions; no separate details panel. -->
                                         <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                                             <Button Style="{StaticResource GhostButton}"
                                                     Padding="0" Width="32" Height="32"
                                                     HorizontalContentAlignment="Center"
                                                     VerticalContentAlignment="Center"
+                                                    Visibility="{Binding IsActive, Converter={StaticResource BoolToVis}}"
+                                                    AutomationProperties.Name="Copy username"
                                                     ToolTip="Copy username"
                                                     Command="{Binding DataContext.CopyUsernameCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding}">
@@ -357,6 +358,8 @@
                                                     Padding="0" Width="32" Height="32" Margin="4,0,0,0"
                                                     HorizontalContentAlignment="Center"
                                                     VerticalContentAlignment="Center"
+                                                    Visibility="{Binding IsActive, Converter={StaticResource BoolToVis}}"
+                                                    AutomationProperties.Name="Copy password"
                                                     ToolTip="Copy password"
                                                     Command="{Binding DataContext.CopyPasswordCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding}">
@@ -366,10 +369,30 @@
                                                     Padding="0" Width="32" Height="32" Margin="4,0,0,0"
                                                     HorizontalContentAlignment="Center"
                                                     VerticalContentAlignment="Center"
+                                                    Visibility="{Binding IsActive, Converter={StaticResource BoolToVis}}"
+                                                    AutomationProperties.Name="Edit entry"
                                                     ToolTip="Edit entry"
                                                     Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding}">
                                                 <TextBlock Text="&#xE70F;" FontFamily="{StaticResource App.IconFont}" FontSize="14"/>
+                                            </Button>
+                                            <Button Style="{StaticResource GhostButton}"
+                                                    Padding="0" Width="32" Height="32" Margin="4,0,0,0"
+                                                    Visibility="{Binding HasTotp, Converter={StaticResource BoolToVis}}"
+                                                    ToolTip="Copy two-step verification code (changes every 30 seconds)"
+                                                    AutomationProperties.Name="Copy two-step verification code"
+                                                    Command="{Binding DataContext.CopyTotpCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}">
+                                                <TextBlock Text="&#xE823;" FontFamily="{StaticResource App.IconFont}" FontSize="14"/>
+                                            </Button>
+                                            <Button Style="{StaticResource GhostButton}"
+                                                    Padding="0" Width="32" Height="32" Margin="4,0,0,0"
+                                                    Visibility="{Binding IsDeleted, Converter={StaticResource BoolToVis}}"
+                                                    ToolTip="Restore from Trash"
+                                                    AutomationProperties.Name="Restore from Trash"
+                                                    Command="{Binding DataContext.RestoreCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}">
+                                                <TextBlock Text="&#xE7A7;" FontFamily="{StaticResource App.IconFont}" FontSize="14"/>
                                             </Button>
                                             <Button Style="{StaticResource GhostButton}"
                                                     Padding="0" Width="32" Height="32" Margin="4,0,0,0"
@@ -470,29 +493,5 @@
                 </Grid>
             </Border>
         </Grid>
-        <Border x:Name="DetailsPanel" Grid.Column="2" Width="270" Margin="0,16,16,16" Padding="18"
-                Background="{DynamicResource App.Surface}" BorderBrush="{DynamicResource App.Border}" BorderThickness="1" CornerRadius="12">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <StackPanel>
-                    <TextBlock Text="ENTRY DETAILS" Foreground="{DynamicResource App.TextMuted}" Margin="0,0,0,16"/>
-                    <TextBlock Text="{Binding SelectedEntry.Title, TargetNullValue=Select an entry}" Foreground="{DynamicResource App.Text}" FontSize="19" FontWeight="SemiBold" TextWrapping="Wrap"/>
-                    <TextBlock Text="Username" Foreground="{DynamicResource App.TextMuted}" Margin="0,18,0,4"/>
-                    <TextBlock Text="{Binding SelectedEntry.Model.Username}" Foreground="{DynamicResource App.Text}" TextWrapping="Wrap"/>
-                    <Button Content="Copy username" Command="{Binding CopyUsernameCommand}" Margin="0,8,0,0"/>
-                    <TextBlock Text="Password" Foreground="{DynamicResource App.TextMuted}" Margin="0,18,0,4"/>
-                    <TextBlock Text="••••••••••••" Foreground="{DynamicResource App.Text}"/>
-                    <Button Content="Copy password" Command="{Binding CopyPasswordCommand}" Margin="0,8,0,0"/>
-                    <Button Content="Copy one-time code" Command="{Binding CopyTotpCommand}" Margin="0,8,0,0"/>
-                    <TextBlock Text="Website" Foreground="{DynamicResource App.TextMuted}" Margin="0,18,0,4"/>
-                    <TextBlock Text="{Binding SelectedEntry.Model.Url}" Foreground="{DynamicResource App.Text}" TextWrapping="Wrap"/>
-                    <TextBlock Text="Notes" Foreground="{DynamicResource App.TextMuted}" Margin="0,18,0,4"/>
-                    <TextBlock Text="{Binding SelectedEntry.Model.Notes}" Foreground="{DynamicResource App.Text}" TextWrapping="Wrap"/>
-                    <TextBlock Text="Last updated" Foreground="{DynamicResource App.TextMuted}" Margin="0,18,0,4"/>
-                    <TextBlock Text="{Binding SelectedEntry.Model.UpdatedAt, StringFormat={}{0:g}}" Foreground="{DynamicResource App.Text}"/>
-                    <Button Content="Edit entry" Command="{Binding EditCommand}" Margin="0,18,0,0"/>
-                    <Button Content="Restore from Trash" Command="{Binding RestoreCommand}" Margin="0,8,0,0"/>
-                </StackPanel>
-            </ScrollViewer>
-        </Border>
     </Grid>
 </UserControl>
