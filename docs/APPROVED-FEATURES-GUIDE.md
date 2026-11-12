@@ -2,7 +2,7 @@
 
 ## Search and navigation
 
-Ctrl+F focuses list search. Use the row icons for entry operations; command palette and bulk selection controls are removed. Categories appear above Smart views in the sidebar. Exact tag filtering combines with ordinary search and the selected view. Custom fields are labeled name/value cards: the name describes the information (for example Account number), and the value is what you store. The checkbox hides the value on screen; all fields remain encrypted.
+Ctrl+F focuses list search. Use the row icons for entry operations; command palette and bulk selection controls are removed. Categories appear above Smart views in the sidebar. Tags are searchable through ordinary search; the separate tag-filter input is removed. Custom fields are labeled name/value cards: the name describes the information (for example Account number), and the value is what you store. The checkbox hides the value on screen; all fields remain encrypted.
 
 ## Appearance and language
 
