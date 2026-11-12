@@ -60,7 +60,7 @@
                     <StackPanel Grid.Row="0" Grid.Column="2">
                         <TextBlock Text="{loc:Loc Key=ke3b89e9d33f8}" FontSize="{DynamicResource App.Font.Small}" FontWeight="SemiBold"
                                    Foreground="{DynamicResource App.TextMuted}" Margin="0,0,0,4"/>
-                        <TextBox Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox FlowDirection="LeftToRight" Language="en-US" Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
 
                     <!-- Row 1: Password (full width) -->
@@ -112,7 +112,7 @@
                     <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,12,0,0">
                         <TextBlock Text="{loc:Loc Key=ke7a241debad5}" FontSize="{DynamicResource App.Font.Small}" FontWeight="SemiBold"
                Foreground="{DynamicResource App.TextMuted}" Margin="0,0,0,4"/>
-                        <TextBox Text="{Binding Url, UpdateSourceTrigger=PropertyChanged}"
+                        <TextBox FlowDirection="LeftToRight" Language="en-US" Text="{Binding Url, UpdateSourceTrigger=PropertyChanged}"
              Height="50"/>
                     </StackPanel>
 

@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=System.Runtime">
 
+    <sys:Double x:Key="App.DialogMaxHeight">700</sys:Double>
     <sys:Double x:Key="App.Font.Small">12</sys:Double>
     <sys:Double x:Key="App.Font.Body">13</sys:Double>
     <sys:Double x:Key="App.Font.Title">17</sys:Double>

@@ -16,6 +16,7 @@ public static class AppearanceService
         MotionService.Mode = settings.Motion;
         LocalizationService.Instance.SetLanguage(settings.Language);
         if (Application.Current is not { } app) return;
+        app.Resources["App.DialogMaxHeight"]=Math.Max(400,SystemParameters.WorkArea.Height-60);
         double size = Math.Clamp(settings.TextSize, 12, 18);
         app.Resources["App.Font.Small"] = size - 1;
         app.Resources["App.Font.Body"] = size;

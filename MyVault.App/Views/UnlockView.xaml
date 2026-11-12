@@ -8,6 +8,7 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=vm:UnlockViewModel}">
 
+    <ScrollViewer MaxHeight="{DynamicResource App.DialogMaxHeight}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
     <Grid Background="{DynamicResource App.Background}">
 
         <Border x:Name="Card"
@@ -245,4 +246,5 @@
             </Grid>
         </Border>
     </Grid>
+    </ScrollViewer>
 </UserControl>

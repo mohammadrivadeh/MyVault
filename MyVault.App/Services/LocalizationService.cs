@@ -47,6 +47,7 @@ public sealed class ChoiceLabelConverter : IMultiValueConverter
     public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
     {
         string text = values[0]?.ToString() ?? "";
+        if(text.Split(", ").All(part=>part is "weak" or "reused" or "old")) return string.Join("، ",text.Split(", ").Select(LocalizationService.Text));
         return text switch { "en" => "English", "fa" => "فارسی", "OnePassword" => "1Password", _ => LocalizationService.Text(text) };
     }
     public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) => throw new NotSupportedException();

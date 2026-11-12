@@ -53,25 +53,25 @@
                     <RadioButton GroupName="Filter" Style="{StaticResource NavButton}" IsChecked="{Binding IsWeakFilter,Mode=OneWay}" Command="{Binding SetFilterCommand}" CommandParameter="Weak">
                         <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="26"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="&#xE7BA;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Width="20" TextAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" Text="{loc:Loc Key=k7c94df3b2522}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" MaxWidth="120" Text="{loc:Loc Key=k7c94df3b2522}" VerticalAlignment="Center"/>
                         </Grid>
                     </RadioButton>
                     <RadioButton GroupName="Filter" Style="{StaticResource NavButton}" IsChecked="{Binding IsReusedFilter,Mode=OneWay}" Command="{Binding SetFilterCommand}" CommandParameter="Reused">
                         <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="26"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="&#xE8D4;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Width="20" TextAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" Text="{loc:Loc Key=kf3f35d906a66}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" MaxWidth="120" Text="{loc:Loc Key=kf3f35d906a66}" VerticalAlignment="Center"/>
                         </Grid>
                     </RadioButton>
                     <RadioButton GroupName="Filter" Style="{StaticResource NavButton}" IsChecked="{Binding IsRecentFilter,Mode=OneWay}" Command="{Binding SetFilterCommand}" CommandParameter="Recent">
                         <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="26"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="&#xE81C;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Width="20" TextAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" Text="{loc:Loc Key=k5c79d33c3443}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" MaxWidth="120" Text="{loc:Loc Key=k5c79d33c3443}" VerticalAlignment="Center"/>
                         </Grid>
                     </RadioButton>
                     <RadioButton GroupName="Filter" Style="{StaticResource NavButton}" IsChecked="{Binding IsTrashFilter,Mode=OneWay}" Command="{Binding SetFilterCommand}" CommandParameter="Trash">
                         <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="26"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="&#xE74D;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Width="20" TextAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" Text="{loc:Loc Key=kc560122ac470}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" MaxWidth="120" Text="{loc:Loc Key=kc560122ac470}" VerticalAlignment="Center"/>
                         </Grid>
                     </RadioButton>
                     <Border Height="1"

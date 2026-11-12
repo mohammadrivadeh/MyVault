@@ -85,9 +85,9 @@
                                         Background="{DynamicResource App.WarningBg}"
                                         Padding="8,2" CornerRadius="4"
                                         Margin="10,0" VerticalAlignment="Center">
-                                    <TextBlock Text="{Binding IssuesText}"
-                                               FontSize="{DynamicResource App.Font.Small}"
-                                               Foreground="{DynamicResource App.Warning}"/>
+                                    <TextBlock FontSize="{DynamicResource App.Font.Small}" Foreground="{DynamicResource App.Warning}">
+                                        <TextBlock.Text><MultiBinding Converter="{StaticResource ChoiceLabel}"><Binding Path="IssuesText"/><Binding Source="{x:Static loc:LocalizationService.Instance}" Path="Language"/></MultiBinding></TextBlock.Text>
+                                    </TextBlock>
                                 </Border>
 
                                 <Button Grid.Column="2" Content="{loc:Loc Key=k21f1595b614f}"

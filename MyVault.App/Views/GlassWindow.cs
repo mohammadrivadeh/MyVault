@@ -10,6 +10,7 @@ public class GlassWindow : Window
     public GlassWindow()
     {
         SetResourceReference(ForegroundProperty, "App.Text");
+        MaxHeight=Math.Max(400,SystemParameters.WorkArea.Height-60);
         WindowStyle = WindowStyle.None;
         AllowsTransparency = true;
         Background = System.Windows.Media.Brushes.Transparent;
