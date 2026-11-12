@@ -5,7 +5,7 @@ A portable Windows password vault built with .NET 10 and WPF. Vault contents sta
 ## Features
 
 - Compact row actions with aligned icons; separate Library, Smart views and Categories navigation.
-- Ctrl+F search, exact tag filtering and compact per-entry row actions.
+- Ctrl+F search and compact per-entry row actions.
 - Six palettes plus Windows-following System, curated accents, text size/density, live preview/revert and reduced motion.
 - English/Persian UI with RTL; credentials and paths remain verbatim.
 - Login, secure-note, API-key and recovery-code templates with encrypted custom fields and bounded password history.
