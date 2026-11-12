@@ -39,4 +39,15 @@ The checked-in folder profile uses a repository-relative destination and win-x64
 - Copy/paste to another app, test history hints, automatic clear and later user copies.
 - Test denied writes, read-only application folder, backup restore and old-password backups.
 - Verify motion Off and Windows reduced motion, including fast repeated navigation.
-- Test Persian/English mixed text. Full localization and RTL layout are not implemented.
+- Test Persian/English mixed text. Persian/RTL is implemented and exercised by Windows integration; visually check mixed-direction account data.
+
+## Advisory inspection
+
+For this cloud checkout with artifacts outside the source tree:
+
+```sh
+export UseArtifactsOutput=true ArtifactsPath=/workspace/build/MyVault EnableWindowsTargeting=true
+dotnet list MyVault.slnx package --vulnerable --include-transitive --format json --no-restore
+```
+
+Inspect errors as well as package vulnerabilities; an empty result after a failed assets lookup is not a clean audit. The Windows integration test uploads synthetic `rows-en.png` / `rows-fa.png` alongside TRX files for layout review. ZXing.Net 0.16.11 is pinned for local QR decoding; no images or keys are uploaded by the application.

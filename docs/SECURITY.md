@@ -2,7 +2,7 @@
 
 Vaults use Argon2id (default 256 MiB, three passes, four lanes) to derive a 256-bit AES-GCM key. Each encryption uses a fresh 96-bit random nonce and 128-bit authentication tag. The plaintext MVLT1 header is authenticated as additional data. Opening requires deriving a key before authenticating that header, so pre-authentication resource limits are essential.
 
-Accepted inputs: vault file at most 64 MiB; header at most 64 KiB; salt 8–64 bytes; Argon2 memory 8 KiB–1 GiB, passes 1–10, lanes 1–16, memory at least eight times lane count. Document version must be one; null required collections/fields and duplicate entry/category IDs are rejected. These limits are policy, not claims that every accepted cost is fast on every machine.
+Accepted inputs: vault file at most 64 MiB; header at most 64 KiB; salt 8–64 bytes; Argon2 memory 8 KiB–1 GiB, passes 1–10, lanes 1–16, memory at least eight times lane count. Header and document versions must agree and be one or two; null required collections/fields and duplicate entry/category IDs are rejected. These limits are policy, not claims that every accepted cost is fast on every machine.
 
 The key and temporary byte buffers are zeroed on defined cleanup paths. Managed strings, UI controls, OS clipboard consumers, crash dumps, swap and a compromised OS are outside guarantees of reliable memory erasure. Do not describe this app as formally audited or immune to malware.
 
@@ -12,6 +12,8 @@ Trash remains encrypted inside the vault until permanently removed. Backups may 
 
 CSV is plaintext and excludes Trash, categories, favorite flags, TOTP and timestamps. It is not a full backup. Untrusted values can be interpreted as formulas by spreadsheet software; import/export preserves credential values rather than silently modifying them. Prefer encrypted backup for full migration.
 
-MVLT1 remains readable by the new version. Older versions ignore the additive `deletedAt` field and may show deleted entries again; do not downgrade an active vault after using Trash. No destructive migration runs automatically.
+Version-1 MVLT1 vaults remain readable. The next save writes header/document version 2 with a rotated old-format backup. Older readers reject version 2 instead of silently dropping custom fields/history. Do not downgrade an active vault. The byte layout and cryptographic algorithms are unchanged; see ADR 0006 for the migration contract.
 
 Not included: cloud synchronization, network breach checks, browser integration, biometric key wrapping, automatic updates or cryptographic audit. Report a suspected vulnerability privately to the repository owner; do not upload real vaults or passwords to issues.
+
+See the [current assessment](SECURITY-ASSESSMENT.md) for evidence, advisory inspection and limits including rollback attacks and managed memory.

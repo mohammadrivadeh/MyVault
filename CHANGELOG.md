@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### Approved phases 1–4
+
+- Executable command/entry palette, exact tag filtering, checkbox bulk edit/delete and unsaved-draft confirmation.
+- English/Persian resources and RTL, Windows-following theme, curated accents, text size/density and full preview rollback.
+- Login/note/API/recovery templates, encrypted custom fields and per-entry bounded password history.
+- Unlocked-session scheduled encrypted backups, strict retention, recent vaults and Chrome/Bitwarden/supported 1Password CSV adapters.
+- Local QR-image and otpauth setup import with supported-profile validation.
+- Uniform row icon geometry and a dedicated Smart views sidebar section.
+- Version-two save migration preserving readable version-one backups; old readers reject new files.
+- Expanded portable and Windows workflows, bilingual synthetic layout screenshots, usage/security guides and ADRs 0006–0008.
+
 ### Added
 
 - Six semantic color palettes with preview/revert and shared motion preferences.
@@ -26,4 +37,4 @@
 
 ### Compatibility
 
-MVLT1 encryption remains unchanged. Older versions may display Trash entries because they ignore the additive deletion timestamp. Old backups keep their original master password. CSV remains plaintext and lossy; use encrypted backups for full transfer.
+MVLT1 byte layout and cryptographic algorithms remain unchanged. New saves write header/document version 2; older readers reject it. Old backups keep their original master password. CSV remains plaintext and lossy; use encrypted backups for full transfer.
