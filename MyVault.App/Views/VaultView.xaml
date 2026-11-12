@@ -1,5 +1,6 @@
 ﻿<UserControl x:Class="MyVault.App.Views.VaultView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:loc="clr-namespace:MyVault.App.Services"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -25,26 +26,66 @@
                 BorderBrush="{DynamicResource App.Border}"
                 BorderThickness="0,0,1,0">
             <Grid Margin="14,20">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
+                <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel>
+                <TextBlock  Text="{loc:Loc Key=k77406d4cbd55}" FontSize="{DynamicResource App.Font.Title}" Foreground="{DynamicResource App.Text}" Margin="12,0,8,16"/>
+                <StackPanel >
+                    <TextBlock Text="{loc:Loc Key=kdc20b3d5d2cd}" Foreground="{DynamicResource App.TextMuted}" Margin="12,0,0,6"/>
+                    <RadioButton GroupName="Filter" Style="{StaticResource NavButton}"
+                                 IsChecked="{Binding IsAllFilter, Mode=OneWay}"
+                                 Command="{Binding SetFilterCommand}" CommandParameter="All">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE8A9;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Width="26" TextAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="{loc:Loc Key=ka52ace420f21}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </RadioButton>
+                    <RadioButton GroupName="Filter" Style="{StaticResource NavButton}"
+                                 IsChecked="{Binding IsFavoritesFilter, Mode=OneWay}"
+                                 Command="{Binding SetFilterCommand}" CommandParameter="Favorites">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="★" FontSize="{DynamicResource App.Font.Body}" Margin="0,0,10,0" Foreground="{DynamicResource App.Warning}"/>
+                            <TextBlock Text="{loc:Loc Key=k7a1f2a83aca9}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </RadioButton>
 
-                <!-- Row 0: Header with inline + button -->
-                <Grid Grid.Row="0" Margin="12,0,8,10">
+                    <TextBlock Text="{loc:Loc Key=kfdd8549491a9}" Foreground="{DynamicResource App.TextMuted}" Margin="12,16,0,6"/>
+                    <RadioButton GroupName="Filter" Style="{StaticResource NavButton}" IsChecked="{Binding IsWeakFilter,Mode=OneWay}" Command="{Binding SetFilterCommand}" CommandParameter="Weak">
+                        <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="26"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE7BA;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Width="20" TextAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="{loc:Loc Key=k7c94df3b2522}" VerticalAlignment="Center"/>
+                        </Grid>
+                    </RadioButton>
+                    <RadioButton GroupName="Filter" Style="{StaticResource NavButton}" IsChecked="{Binding IsReusedFilter,Mode=OneWay}" Command="{Binding SetFilterCommand}" CommandParameter="Reused">
+                        <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="26"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE8D4;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Width="20" TextAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="{loc:Loc Key=kf3f35d906a66}" VerticalAlignment="Center"/>
+                        </Grid>
+                    </RadioButton>
+                    <RadioButton GroupName="Filter" Style="{StaticResource NavButton}" IsChecked="{Binding IsRecentFilter,Mode=OneWay}" Command="{Binding SetFilterCommand}" CommandParameter="Recent">
+                        <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="26"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE81C;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Width="20" TextAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="{loc:Loc Key=k5c79d33c3443}" VerticalAlignment="Center"/>
+                        </Grid>
+                    </RadioButton>
+                    <RadioButton GroupName="Filter" Style="{StaticResource NavButton}" IsChecked="{Binding IsTrashFilter,Mode=OneWay}" Command="{Binding SetFilterCommand}" CommandParameter="Trash">
+                        <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="26"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE74D;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Width="20" TextAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="{loc:Loc Key=kc560122ac470}" VerticalAlignment="Center"/>
+                        </Grid>
+                    </RadioButton>
+                    <Border Height="1"
+                            Background="{DynamicResource App.Border}"
+                            Margin="8,8,8,8"/>
+                </StackPanel>                <Grid  Margin="12,8,8,8">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Grid.Column="0"
-                               Text="VAULT CATEGORIES"
-                               FontSize="10" FontWeight="SemiBold"
+                               Text="{loc:Loc Key=kb8b1d894c683}"
+                               FontSize="{DynamicResource App.Font.Small}" FontWeight="SemiBold"
                                Foreground="{DynamicResource App.TextDisabled}"
                                VerticalAlignment="Center"/>
 
@@ -57,7 +98,7 @@
                             BorderBrush="{DynamicResource App.Accent}"
                             BorderThickness="1"
                             Foreground="{DynamicResource App.Accent}"
-                            ToolTip="New category"
+                            ToolTip="{loc:Loc Key=k1ab1e121c0df}"
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center">
                         <Button.Template>
@@ -68,7 +109,7 @@
                                         BorderThickness="{TemplateBinding BorderThickness}"
                                         CornerRadius="5">
                                     <TextBlock Text="+"
-                                               FontSize="14"
+                                               FontSize="{DynamicResource App.Font.Body}"
                                                FontWeight="Bold"
                                                Foreground="{TemplateBinding Foreground}"
                                                HorizontalAlignment="Center"
@@ -87,45 +128,7 @@
                             </ControlTemplate>
                         </Button.Template>
                     </Button>
-                </Grid>
-
-                <!-- Row 2: All / Favorites + divider -->
-                <StackPanel Grid.Row="2">
-                    <RadioButton GroupName="Filter" Style="{StaticResource NavButton}"
-                                 IsChecked="{Binding IsAllFilter, Mode=OneWay}"
-                                 Command="{Binding SetFilterCommand}" CommandParameter="All">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="&#xE8A9;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Margin="0,0,10,0"/>
-                            <TextBlock Text="All" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </RadioButton>
-                    <RadioButton GroupName="Filter" Style="{StaticResource NavButton}"
-                                 IsChecked="{Binding IsFavoritesFilter, Mode=OneWay}"
-                                 Command="{Binding SetFilterCommand}" CommandParameter="Favorites">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="★" FontSize="14" Margin="0,0,10,0" Foreground="{DynamicResource App.Warning}"/>
-                            <TextBlock Text="Favorites" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </RadioButton>
-
-                    <Border Height="1"
-                            Background="{DynamicResource App.Border}"
-                            Margin="8,8,8,8"/>
-                </StackPanel>
-
-                <!-- Row 4: Categories list -->
-                <ScrollViewer Grid.Row="4"
-                              MaxHeight="220"
-                              VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollBarVisibility="Disabled">
-                    <StackPanel>
-                    <WrapPanel Margin="0,0,0,8">
-                        <Button Content="Weak" Command="{Binding SetFilterCommand}" CommandParameter="Weak" Padding="6,4" Margin="2"/>
-                        <Button Content="Reused" Command="{Binding SetFilterCommand}" CommandParameter="Reused" Padding="6,4" Margin="2"/>
-                        <Button Content="Recent" Command="{Binding SetFilterCommand}" CommandParameter="Recent" Padding="6,4" Margin="2"/>
-                        <Button Content="Trash" Command="{Binding SetFilterCommand}" CommandParameter="Trash" Padding="6,4" Margin="2"/>
-                    </WrapPanel>
-                    <ItemsControl ItemsSource="{Binding Categories}">
+                </Grid>                    <ItemsControl ItemsSource="{Binding Categories}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="{x:Type vm:CategoryViewModel}">
                                 <Grid>
@@ -156,7 +159,7 @@
                                                 Margin="0,0,6,0">
                                         <Button Style="{StaticResource GhostButton}"
                                                 Width="22" Height="22" Padding="5"
-                                                ToolTip="Rename category"
+                                                ToolTip="{loc:Loc Key=k897993135e2c}"
                                                 Click="RenameCategoryInline_Click">
                                             <TextBlock Text="&#xE70F;"
                                                        FontFamily="{StaticResource App.IconFont}"
@@ -164,7 +167,7 @@
                                         </Button>
                                         <Button Style="{StaticResource GhostButton}"
                                                 Width="22" Height="22" Padding="5" Margin="2,0,0,0"
-                                                ToolTip="Delete category"
+                                                ToolTip="{loc:Loc Key=ka91d00879a3d}"
                                                 Foreground="{DynamicResource App.Error}"
                                                 Click="DeleteCategoryInline_Click">
                                             <TextBlock Text="&#xE74D;"
@@ -178,51 +181,49 @@
                     </ItemsControl>
                     </StackPanel>
                 </ScrollViewer>
-
-                <!-- Row 6: Bottom actions -->
-                <StackPanel Grid.Row="6">
+                <StackPanel Grid.Row="1">
                     <Separator Margin="0,0,0,10" Background="{DynamicResource App.BorderSubtle}"/>
                     <Button Style="{StaticResource PrimaryButton}" Command="{Binding AddCommand}"
                             HorizontalAlignment="Stretch" Margin="0,0,0,8" Height="36">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <TextBlock Text="+" FontSize="15" FontWeight="Bold" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="New" VerticalAlignment="Center"/>
+                            <TextBlock Text="+" FontSize="{DynamicResource App.Font.Title}" FontWeight="Bold" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="{loc:Loc Key=k18fdd549b2ed}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                     <Button Style="{StaticResource GhostButton}" Command="{Binding HealthCommand}" HorizontalAlignment="Stretch">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="&#xE95E;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Margin="0,0,10,0"/>
-                            <TextBlock Text="Health" VerticalAlignment="Center"/>
+                            <TextBlock Text="&#xE95E;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Width="26" TextAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="{loc:Loc Key=k55898449eb74}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                     <Button Style="{StaticResource GhostButton}" Command="{Binding ImportExportCommand}" HorizontalAlignment="Stretch">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="&#xEDE1;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Margin="0,0,10,0"/>
-                            <TextBlock Text="Import / Export" VerticalAlignment="Center"/>
+                            <TextBlock Text="&#xEDE1;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Width="26" TextAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="{loc:Loc Key=k6e061fabef21}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                     <Button Style="{StaticResource GhostButton}" Command="{Binding SettingsCommand}" HorizontalAlignment="Stretch">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="&#xE713;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Margin="0,0,10,0"/>
-                            <TextBlock Text="Settings" VerticalAlignment="Center"/>
+                            <TextBlock Text="&#xE713;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Width="26" TextAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="{loc:Loc Key=k74a883a037bc}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                     <Button Style="{StaticResource GhostButton}" Command="{Binding HelpCommand}" HorizontalAlignment="Stretch">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="&#xE897;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Margin="0,0,10,0"/>
-                            <TextBlock Text="Help" VerticalAlignment="Center"/>
+                            <TextBlock Text="&#xE897;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Width="26" TextAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="{loc:Loc Key=kb79cac926e0b}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                     <Button Style="{StaticResource GhostButton}" Command="{Binding AboutCommand}" HorizontalAlignment="Stretch">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="&#xE946;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Margin="0,0,10,0"/>
-                            <TextBlock Text="About" VerticalAlignment="Center"/>
+                            <TextBlock Text="&#xE946;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Width="26" TextAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="{loc:Loc Key=k4efca0d10c5f}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                     <Button Style="{StaticResource GhostButton}" Command="{Binding LockCommand}" HorizontalAlignment="Stretch" Margin="0,8,0,0">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="&#xE72E;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Margin="0,0,10,0"/>
-                            <TextBlock Text="Lock" VerticalAlignment="Center"/>
+                            <TextBlock Text="&#xE72E;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Width="26" TextAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="{loc:Loc Key=kdb44b8db4f05}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -243,14 +244,15 @@
                     Background="{DynamicResource App.SurfaceGlass}"
                     BorderBrush="{DynamicResource App.BorderGlass}"
                     BorderThickness="1" CornerRadius="12" Padding="6">
+                <StackPanel>
                 <Grid>
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="125"/></Grid.ColumnDefinitions>
-                    <ComboBox Grid.Column="1" ItemsSource="{Binding SortOptions}" SelectedItem="{Binding SortBy}" ToolTip="Sort entries" AutomationProperties.Name="Sort entries"/>
+                    <ComboBox Grid.Column="1" ItemsSource="{Binding SortOptions}" SelectedItem="{Binding SortBy}" ToolTip="{loc:Loc Key=k5474e1893910}" AutomationProperties.Name="{loc:Loc Key=k5474e1893910}"><ComboBox.ItemTemplate><DataTemplate><TextBlock><TextBlock.Text><MultiBinding Converter="{StaticResource ChoiceLabel}"><Binding/><Binding Source="{x:Static loc:LocalizationService.Instance}" Path="Language"/></MultiBinding></TextBlock.Text></TextBlock></DataTemplate></ComboBox.ItemTemplate></ComboBox>
                     <TextBox x:Name="SearchBox"
                              Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                              BorderThickness="0" Background="Transparent"
-                             Padding="10,7" FontSize="13"/>
-                    <TextBlock Text="Search entries…  Ctrl+K"
+                             Padding="10,7" FontSize="{DynamicResource App.Font.Body}"/>
+                    <TextBlock Text="{loc:Loc Key=k092ec953e2df}"
                                Foreground="{DynamicResource App.TextDisabled}"
                                Margin="12,0,0,0" VerticalAlignment="Center"
                                IsHitTestVisible="False">
@@ -266,6 +268,16 @@
                         </TextBlock.Style>
                     </TextBlock>
                 </Grid>
+                <WrapPanel Margin="0,8,0,0">
+                    <Button Content="{loc:Loc Key=kb25dc0353c76}" Command="{Binding CommandPaletteCommand}" Padding="6,4" Margin="2"/>
+                    <TextBox Width="120" Text="{Binding TagFilter,UpdateSourceTrigger=PropertyChanged}" ToolTip="{loc:Loc Key=k17243c3c2082}" AutomationProperties.Name="{loc:Loc Key=kb9274474d099}" Margin="2"/>
+                    <Button Content="{loc:Loc Key=k70f58736b63e}" Command="{Binding SelectVisibleCommand}" Padding="6,4" Margin="2"/>
+                    <Button Content="{loc:Loc Key=kcea4d2e010b8}" Command="{Binding ClearSelectionCommand}" Padding="6,4" Margin="2"/>
+                    <Button Content="{loc:Loc Key=kdcbc054a145f}" Command="{Binding BulkEditCommand}" Padding="6,4" Margin="2"/>
+                    <Button Content="{loc:Loc Key=kd2ab5d46fed4}" Command="{Binding BulkDeleteCommand}" Padding="6,4" Margin="2"/>
+                    <TextBlock Text="{Binding SelectionSummary}" VerticalAlignment="Center" Margin="6" Foreground="{DynamicResource App.TextMuted}"/>
+                </WrapPanel>
+                </StackPanel>
             </Border>
 
             <!-- Entry list -->
@@ -301,7 +313,7 @@
 
                         <ListBox.ItemTemplate>
                             <DataTemplate DataType="{x:Type vm:VaultEntryViewModel}">
-                                <Border Padding="14,11"
+                                <Border Padding="{DynamicResource App.RowPadding}"
                                         Background="{DynamicResource App.Surface}"
                                         BorderBrush="{DynamicResource App.Border}"
                                         BorderThickness="1" CornerRadius="10">
@@ -314,7 +326,7 @@
 
                                         <TextBlock Grid.Column="0" Text="★"
                                                    Foreground="{DynamicResource App.Warning}"
-                                                   FontSize="16" Margin="0,0,12,0"
+                                                   FontSize="{DynamicResource App.Font.Title}" Margin="0,0,12,0"
                                                    VerticalAlignment="Center"
                                                    Visibility="{Binding IsFavorite, Converter={StaticResource BoolToVis}}"/>
 
@@ -329,11 +341,11 @@
                                             </Border>
                                             <StackPanel VerticalAlignment="Center">
                                                 <TextBlock Text="{Binding Title}"
-                                                           FontSize="14" FontWeight="SemiBold"
+                                                           FontSize="{DynamicResource App.Font.Body}" FontWeight="SemiBold"
                                                            Foreground="{DynamicResource App.Text}"
                                                            TextTrimming="CharacterEllipsis"/>
                                                 <TextBlock Text="{Binding Subtitle}"
-                                                           FontSize="12"
+                                                           FontSize="{DynamicResource App.Font.Small}"
                                                            Foreground="{DynamicResource App.TextMuted}"
                                                            Margin="0,2,0,0"
                                                            TextTrimming="CharacterEllipsis"
@@ -343,66 +355,53 @@
 
                                         <!-- Contextual row actions; no separate details panel. -->
                                         <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                                            <Button Style="{StaticResource GhostButton}"
-                                                    Padding="0" Width="32" Height="32"
-                                                    HorizontalContentAlignment="Center"
-                                                    VerticalContentAlignment="Center"
+                                            <CheckBox IsChecked="{Binding IsSelected}" ToolTip="{loc:Loc Key=k5ce132ef818f}" AutomationProperties.Name="{loc:Loc Key=k5ce132ef818f}" Margin="4,0,8,0" VerticalAlignment="Center"/>
+                                            <Button Style="{StaticResource RowIconButton}"
                                                     Visibility="{Binding IsActive, Converter={StaticResource BoolToVis}}"
-                                                    AutomationProperties.Name="Copy username"
-                                                    ToolTip="Copy username"
+                                                    AutomationProperties.Name="{loc:Loc Key=k7ba3cdab9a58}"
+                                                    ToolTip="{loc:Loc Key=k7ba3cdab9a58}"
                                                     Command="{Binding DataContext.CopyUsernameCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding}">
-                                                <TextBlock Text="&#xE77B;" FontFamily="{StaticResource App.IconFont}" FontSize="14"/>
+                                                <TextBlock Text="&#xE77B;" Style="{StaticResource RowIconGlyph}"/>
                                             </Button>
-                                            <Button Style="{StaticResource GhostButton}"
-                                                    Padding="0" Width="32" Height="32" Margin="4,0,0,0"
-                                                    HorizontalContentAlignment="Center"
-                                                    VerticalContentAlignment="Center"
+                                            <Button Style="{StaticResource RowIconButton}"
                                                     Visibility="{Binding IsActive, Converter={StaticResource BoolToVis}}"
-                                                    AutomationProperties.Name="Copy password"
-                                                    ToolTip="Copy password"
+                                                    AutomationProperties.Name="{loc:Loc Key=ke8cd8b5d57c9}"
+                                                    ToolTip="{loc:Loc Key=ke8cd8b5d57c9}"
                                                     Command="{Binding DataContext.CopyPasswordCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding}">
-                                                <TextBlock Text="&#xE192;" FontFamily="{StaticResource App.IconFont}" FontSize="14"/>
+                                                <TextBlock Text="&#xE192;" Style="{StaticResource RowIconGlyph}"/>
                                             </Button>
-                                            <Button Style="{StaticResource GhostButton}"
-                                                    Padding="0" Width="32" Height="32" Margin="4,0,0,0"
-                                                    HorizontalContentAlignment="Center"
-                                                    VerticalContentAlignment="Center"
+                                            <Button Style="{StaticResource RowIconButton}"
                                                     Visibility="{Binding IsActive, Converter={StaticResource BoolToVis}}"
-                                                    AutomationProperties.Name="Edit entry"
-                                                    ToolTip="Edit entry"
+                                                    AutomationProperties.Name="{loc:Loc Key=k93231772b203}"
+                                                    ToolTip="{loc:Loc Key=k93231772b203}"
                                                     Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding}">
-                                                <TextBlock Text="&#xE70F;" FontFamily="{StaticResource App.IconFont}" FontSize="14"/>
+                                                <TextBlock Text="&#xE70F;" Style="{StaticResource RowIconGlyph}"/>
                                             </Button>
-                                            <Button Style="{StaticResource GhostButton}"
-                                                    Padding="0" Width="32" Height="32" Margin="4,0,0,0"
+                                            <Button Style="{StaticResource RowIconButton}"
                                                     Visibility="{Binding HasTotp, Converter={StaticResource BoolToVis}}"
-                                                    ToolTip="Copy two-step verification code (changes every 30 seconds)"
-                                                    AutomationProperties.Name="Copy two-step verification code"
+                                                    ToolTip="{loc:Loc Key=k110a6a01eba6}"
+                                                    AutomationProperties.Name="{loc:Loc Key=kbc443c51ad40}"
                                                     Command="{Binding DataContext.CopyTotpCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding}">
-                                                <TextBlock Text="&#xE823;" FontFamily="{StaticResource App.IconFont}" FontSize="14"/>
+                                                <TextBlock Text="&#xE823;" Style="{StaticResource RowIconGlyph}"/>
                                             </Button>
-                                            <Button Style="{StaticResource GhostButton}"
-                                                    Padding="0" Width="32" Height="32" Margin="4,0,0,0"
+                                            <Button Style="{StaticResource RowIconButton}"
                                                     Visibility="{Binding IsDeleted, Converter={StaticResource BoolToVis}}"
-                                                    ToolTip="Restore from Trash"
-                                                    AutomationProperties.Name="Restore from Trash"
+                                                    ToolTip="{loc:Loc Key=kee661347c0df}"
+                                                    AutomationProperties.Name="{loc:Loc Key=kee661347c0df}"
                                                     Command="{Binding DataContext.RestoreCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding}">
-                                                <TextBlock Text="&#xE7A7;" FontFamily="{StaticResource App.IconFont}" FontSize="14"/>
+                                                <TextBlock Text="&#xE7A7;" Style="{StaticResource RowIconGlyph}"/>
                                             </Button>
-                                            <Button Style="{StaticResource GhostButton}"
-                                                    Padding="0" Width="32" Height="32" Margin="4,0,0,0"
-                                                    HorizontalContentAlignment="Center"
-                                                    VerticalContentAlignment="Center"
-                                                    ToolTip="Delete entry"
+                                            <Button Style="{StaticResource RowIconButton}"
+                                                    ToolTip="{loc:Loc Key=kd2968b26e985}"
                                                     Foreground="{DynamicResource App.Error}"
                                                     Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding}">
-                                                <TextBlock Text="&#xE74D;" FontFamily="{StaticResource App.IconFont}" FontSize="14"/>
+                                                <TextBlock Text="&#xE74D;" Style="{StaticResource RowIconGlyph}"/>
                                             </Button>
                                         </StackPanel>
                                     </Grid>
@@ -418,7 +417,7 @@
                             <TextBlock Text="&#xE8F1;" FontFamily="{StaticResource App.IconFont}"
                                        FontSize="44" Foreground="{DynamicResource App.TextDisabled}"
                                        HorizontalAlignment="Center" Margin="0,0,0,14"/>
-                            <TextBlock Text="{Binding EmptyStateText}" FontSize="13"
+                            <TextBlock Text="{Binding EmptyStateText}" FontSize="{DynamicResource App.Font.Body}"
                                        Foreground="{DynamicResource App.TextMuted}"
                                        TextAlignment="Center" TextWrapping="Wrap"/>
                         </StackPanel>
@@ -435,7 +434,7 @@
                     Padding="14,9" MinHeight="44">
                 <Grid>
                     <TextBlock Text="{Binding StatusMessage}"
-                               FontSize="12" VerticalAlignment="Center"
+                               FontSize="{DynamicResource App.Font.Small}" VerticalAlignment="Center"
                                Foreground="{DynamicResource App.TextMuted}">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
@@ -480,11 +479,11 @@
                                            Foreground="{DynamicResource App.Text}"
                                            VerticalAlignment="Center"/>
                                 <TextBlock Text="{Binding CountdownMessage}"
-                                           FontSize="12" FontWeight="SemiBold"
+                                           FontSize="{DynamicResource App.Font.Small}" FontWeight="SemiBold"
                                            Foreground="{DynamicResource App.Text}"
                                            VerticalAlignment="Center"/>
                                 <TextBlock Text="{Binding CountdownLabel}"
-                                           FontSize="12" Margin="2,0,0,0"
+                                           FontSize="{DynamicResource App.Font.Small}" Margin="2,0,0,0"
                                            Foreground="{DynamicResource App.TextMuted}"
                                            VerticalAlignment="Center"/>
                             </StackPanel>

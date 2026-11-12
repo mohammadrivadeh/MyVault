@@ -4,6 +4,8 @@ namespace MyVault.App.ViewModels;
 
 public sealed class VaultEntryViewModel : ObservableObject
 {
+    private bool _isSelected;
+    public bool IsSelected { get => _isSelected; set => SetProperty(ref _isSelected, value); }
     public VaultEntry Model { get; }
 
     public VaultEntryViewModel(VaultEntry model)

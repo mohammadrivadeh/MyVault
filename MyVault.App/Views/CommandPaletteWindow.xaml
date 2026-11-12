@@ -1,0 +1,16 @@
+<views:GlassWindow x:Class="MyVault.App.Views.CommandPaletteWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:loc="clr-namespace:MyVault.App.Services"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:views="clr-namespace:MyVault.App.Views"
+ Title="{loc:Loc Key=kb38eb7cd7c29}" Width="600" Height="460">
+ <Border Background="{DynamicResource App.Background}" Padding="20" BorderBrush="{DynamicResource App.Border}" BorderThickness="1" CornerRadius="12">
+  <Grid>
+   <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+   <TextBlock Text="{loc:Loc Key=kb38eb7cd7c29}" Foreground="{DynamicResource App.Text}" FontSize="{DynamicResource App.Font.Title}" Margin="0,0,0,12"/>
+   <TextBox x:Name="QueryBox" Grid.Row="1" Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="{loc:Loc Key=ka244d2abae52}"/>
+   <ListBox x:Name="Results" Grid.Row="2" ItemsSource="{Binding Actions}" SelectedItem="{Binding Selected}" Margin="0,10" MouseDoubleClick="Run_Click" HorizontalContentAlignment="Stretch">
+    <ListBox.ItemTemplate><DataTemplate><StackPanel Margin="8"><TextBlock Text="{Binding Title}" Foreground="{DynamicResource App.Text}"/><TextBlock Text="{Binding Description}" Foreground="{DynamicResource App.TextMuted}" TextTrimming="CharacterEllipsis"/></StackPanel></DataTemplate></ListBox.ItemTemplate>
+   </ListBox>
+   <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right"><Button Content="{loc:Loc Key=k19766ed6ccb2}" IsCancel="True" Margin="0,0,8,0"/><Button Content="{loc:Loc Key=k00d60e31a4e6}" IsDefault="True" Command="{Binding RunCommand}"/></StackPanel>
+  </Grid>
+ </Border>
+</views:GlassWindow>

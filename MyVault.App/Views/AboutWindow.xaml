@@ -1,11 +1,12 @@
 ﻿<views:GlassWindow x:Class="MyVault.App.Views.AboutWindow"
                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:loc="clr-namespace:MyVault.App.Services"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:views="clr-namespace:MyVault.App.Views"
                    mc:Ignorable="d"
-                   Title="About MyVault"
+                   Title="{loc:Loc Key=k7517008928da}"
                    Width="480" SizeToContent="Height">
 
     <Border Background="{DynamicResource App.Background}"
@@ -33,10 +34,10 @@
            RenderOptions.BitmapScalingMode="HighQuality"/>
                 </Border>
 
-                <TextBlock Text="MyVault" FontSize="22" FontWeight="Bold"
+                <TextBlock Text="{loc:Loc Key=k77406d4cbd55}" FontSize="{DynamicResource App.Font.Title}" FontWeight="Bold"
                            Foreground="{DynamicResource App.Text}"
                            HorizontalAlignment="Center" Margin="0,14,0,2"/>
-                <TextBlock x:Name="VersionText" Text="Version 1.0.0" FontSize="12"
+                <TextBlock x:Name="VersionText" Text="{loc:Loc Key=k108ac1ea9492}" FontSize="{DynamicResource App.Font.Small}"
                            Foreground="{DynamicResource App.TextMuted}"
                            HorizontalAlignment="Center"/>
             </StackPanel>
@@ -46,15 +47,11 @@
                         BorderBrush="{DynamicResource App.BorderGlass}" BorderThickness="1"
                         Padding="14">
                     <StackPanel>
-                        <TextBlock Text="A personal, offline password manager."
-                                   FontSize="13" Foreground="{DynamicResource App.Text}"
+                        <TextBlock Text="{loc:Loc Key=k9aa2ae2b2cfc}"
+                                   FontSize="{DynamicResource App.Font.Body}" Foreground="{DynamicResource App.Text}"
                                    TextWrapping="Wrap" Margin="0,0,0,8"/>
-                        <TextBlock FontSize="12" Foreground="{DynamicResource App.TextMuted}"
-                                   TextWrapping="Wrap" LineHeight="18">
-                            All data is stored in a single encrypted file on this computer.
-                            No cloud. No accounts. No telemetry. Your master password never
-                            leaves this machine.
-                        </TextBlock>
+                        <TextBlock FontSize="{DynamicResource App.Font.Small}" Foreground="{DynamicResource App.TextMuted}"
+                                   TextWrapping="Wrap" LineHeight="18" Text="{loc:Loc Key=k95fc861e5cdc}"/>
                     </StackPanel>
                 </Border>
 
@@ -74,30 +71,30 @@
                         </Grid.RowDefinitions>
 
 
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Encryption" FontSize="12"
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{loc:Loc Key=k82f4e719a19c}" FontSize="{DynamicResource App.Font.Small}"
                                    Foreground="{DynamicResource App.TextMuted}" Margin="0,0,0,6"/>
-                        <TextBlock Grid.Row="1" Grid.Column="1" Text="AES-256-GCM + Argon2id" FontSize="12"
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{loc:Loc Key=kacf67734d4b5}" FontSize="{DynamicResource App.Font.Small}"
                                    Foreground="{DynamicResource App.Text}" Margin="0,0,0,6"/>
 
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Data location" FontSize="12"
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Loc Key=kc6f1a54d31ab}" FontSize="{DynamicResource App.Font.Small}"
                                    Foreground="{DynamicResource App.TextMuted}" Margin="0,0,0,6"/>
-                        <TextBlock Grid.Row="2" Grid.Column="1" Text="MyVault\vault.dat" FontSize="12"
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{loc:Loc Key=ka86d20e91831}" FontSize="{DynamicResource App.Font.Small}"
                                    Foreground="{DynamicResource App.Text}" Margin="0,0,0,6"
                                    TextTrimming="CharacterEllipsis"/>
 
-                        <TextBlock Grid.Row="3" Grid.Column="0" Text="License" FontSize="12"
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="{loc:Loc Key=kc011d6097bfb}" FontSize="{DynamicResource App.Font.Small}"
                                    Foreground="{DynamicResource App.TextMuted}"/>
-                        <TextBlock Grid.Row="3" Grid.Column="1" Text="Personal use" FontSize="12"
+                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{loc:Loc Key=k0534b2f200ff}" FontSize="{DynamicResource App.Font.Small}"
                                    Foreground="{DynamicResource App.Text}"/>
                     </Grid>
                 </Border>
             </StackPanel>
 
             <StackPanel Grid.Row="2" Margin="0,20,0,0">
-                <TextBlock Text="© 2026 — Built for personal, offline security."
-                           FontSize="11" Foreground="{DynamicResource App.TextMuted}"
+                <TextBlock Text="{loc:Loc Key=ke9f5234b4cb2}"
+                           FontSize="{DynamicResource App.Font.Small}" Foreground="{DynamicResource App.TextMuted}"
                            HorizontalAlignment="Center" Margin="0,0,0,14"/>
-                <Button Content="Close" HorizontalAlignment="Center"
+                <Button Content="{loc:Loc Key=k7d9eb7acb13e}" HorizontalAlignment="Center"
                         MinWidth="100" IsCancel="True" IsDefault="True" Click="Close_Click"/>
             </StackPanel>
         </Grid>

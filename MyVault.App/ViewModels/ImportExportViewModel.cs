@@ -25,6 +25,8 @@ public sealed class ImportExportViewModel : ObservableObject
         DownloadTemplateCommand = new RelayCommand(_ => DownloadTemplate());
     }
 
+    public IReadOnlyList<CsvSource> ImportSources { get; } = Enum.GetValues<CsvSource>();
+    public CsvSource ImportSource { get; set; } = CsvSource.Auto;
     public event EventHandler? CloseRequested;
 
     public IReadOnlyList<VaultEntry>? ImportedEntries { get; private set; }
@@ -41,7 +43,7 @@ public sealed class ImportExportViewModel : ObservableObject
 
     private void RestoreBackup()
     {
-        var dialog = new OpenFileDialog { Title = "Restore encrypted backup", Filter = "Vault and backups|*.vault;*.dat;*.bak.*|All files|*.*" };
+        var dialog = new OpenFileDialog { Title = MyVault.App.Services.LocalizationService.Text("Restore encrypted backup"), Filter = "Vault and backups|*.vault;*.dat;*.bak.*|All files|*.*" };
         if (dialog.ShowDialog() != true) return;
         if (!Dialogs.Confirm("Replace current entries with this backup? The current vault will be rotated into a backup first. Backups from before a master-password change require their original password and must be opened separately.", "Restore backup")) return;
         byte[]? blob = null;
@@ -61,7 +63,7 @@ public sealed class ImportExportViewModel : ObservableObject
         {
             Filter = "MyVault backup (*.vault)|*.vault|All files (*.*)|*.*",
             FileName = $"myvault-backup-{DateTime.Now:yyyy-MM-dd-HHmm}.vault",
-            Title = "Save encrypted backup"
+            Title = MyVault.App.Services.LocalizationService.Text("Save encrypted backup")
         };
         if (dlg.ShowDialog() != true) return;
 
@@ -89,19 +91,14 @@ public sealed class ImportExportViewModel : ObservableObject
             return;
         }
 
-        if (!Dialogs.Confirm(
-                "This will create a PLAINTEXT CSV file with every username and password in your vault.\n\n" +
-                "Anyone who gets that file can read all your passwords.\n\nCSV excludes Trash, categories, favorites, TOTP and timestamps. Use an encrypted backup for a complete copy. Opening untrusted CSV in a spreadsheet may interpret formulas.\n\n" +
-                "Delete it as soon as you've imported it into whatever tool you need.\n\n" +
-                "Continue?",
-                "Export to CSV"))
+        if (!Dialogs.Confirm("CSV is plaintext and incomplete. It excludes custom fields, history, categories, favorites, TOTP, timestamps and Trash. Anyone with the file can read its passwords. Spreadsheet software may interpret untrusted values as formulas. Use an encrypted backup for a complete transfer. Continue?","Export to CSV"))
             return;
 
         var dlg = new SaveFileDialog
         {
             Filter = "CSV file (*.csv)|*.csv",
             FileName = $"myvault-export-{DateTime.Now:yyyy-MM-dd}.csv",
-            Title = "Export to CSV (plaintext)"
+            Title = MyVault.App.Services.LocalizationService.Text("Export to CSV (plaintext)")
         };
         if (dlg.ShowDialog() != true) return;
 
@@ -144,15 +141,15 @@ public sealed class ImportExportViewModel : ObservableObject
         var dlg = new OpenFileDialog
         {
             Filter = "CSV file (*.csv)|*.csv|All files (*.*)|*.*",
-            Title = "Import from CSV"
+            Title = MyVault.App.Services.LocalizationService.Text("Import from CSV")
         };
         if (dlg.ShowDialog() != true) return;
 
         CsvImportPreview preview;
         try
         {
-            string text = File.ReadAllText(dlg.FileName, Encoding.UTF8);
-            preview = CsvImporter.Analyze(text);
+            string text = new FileInfo(dlg.FileName).Length > 16 * 1024 * 1024 ? throw new IOException("CSV exceeds the 16 MiB import limit.") : File.ReadAllText(dlg.FileName, Encoding.UTF8);
+            preview = CsvImporter.Analyze(text, ImportSource);
         }
         catch (Exception ex)
         {
@@ -169,16 +166,16 @@ public sealed class ImportExportViewModel : ObservableObject
             return;
         }
 
-        string message = $"Found {preview.Entries.Count} entries to import.";
+        string message = LocalizationService.Format("Found {0} entries to import.",preview.Entries.Count);
         if (preview.Skipped > 0)
-            message += $"\n{preview.Skipped} rows skipped (missing title).";
-        message += "\n\nExact matches by title, username and URL will be skipped. Existing entries will not be overwritten. Add the remaining entries?";
+            message += "\n"+LocalizationService.Format("{0} rows skipped (missing title).",preview.Skipped);
+        message += "\n\n"+LocalizationService.Text("Exact matches by title, username and URL will be skipped. Existing entries will not be overwritten. Add the remaining entries?");
 
         if (!Dialogs.Confirm(message, "Import from CSV"))
             return;
 
         ImportedEntries = preview.Entries.DistinctBy(e => (e.Title.ToUpperInvariant(), e.Username, e.Url)).Where(entry => !_repository.Document.Entries.Any(e => e.DeletedAt is null && string.Equals(e.Title, entry.Title, StringComparison.OrdinalIgnoreCase) && e.Username == entry.Username && e.Url == entry.Url)).ToList();
-        FinalStatusMessage = $"{ImportedEntries.Count} entries imported; {preview.Entries.Count - ImportedEntries.Count} duplicates skipped.";
+        FinalStatusMessage = LocalizationService.Format("{0} entries imported; {1} duplicates skipped.",ImportedEntries.Count,preview.Entries.Count-ImportedEntries.Count);
         CloseRequested?.Invoke(this, EventArgs.Empty);
     }
 
@@ -188,7 +185,7 @@ public sealed class ImportExportViewModel : ObservableObject
         {
             Filter = "CSV template (*.csv)|*.csv",
             FileName = "myvault-import-template.csv",
-            Title = "Save CSV template"
+            Title = MyVault.App.Services.LocalizationService.Text("Save CSV template")
         };
         if (dlg.ShowDialog() != true) return;
 

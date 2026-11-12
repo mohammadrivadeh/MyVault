@@ -93,6 +93,8 @@ public sealed class VaultRepository : IDisposable
             if (_key is null)
                 throw new InvalidOperationException("Vault is locked.");
 
+            Header.FormatVersion = VaultHeader.CurrentFormatVersion;
+            Document.Version = 2;
             Document.LastSavedAt = DateTimeOffset.UtcNow;
             byte[] blob = VaultFile.Encrypt(Document, _key.Span, Header);
             try { VaultFile.WriteAtomic(VaultPath, blob, MaxBackups); }
@@ -216,6 +218,9 @@ public sealed class VaultRepository : IDisposable
                 foreach (var entry in Document.Entries)
                 {
                     entry.Password = string.Empty; entry.Username = string.Empty; entry.Notes = string.Empty; entry.TotpSecret = null;
+                    foreach (var field in entry.CustomFields) field.Value = "";
+                    foreach (var revision in entry.PasswordHistory) revision.Password = "";
+                    entry.CustomFields.Clear(); entry.PasswordHistory.Clear();
                 }
                 Document.Entries.Clear();
                 Document.Categories.Clear();
@@ -263,6 +268,18 @@ public sealed class VaultRepository : IDisposable
             VaultFile.ReadHeader(blob);
             var restored = VaultFile.Decrypt(blob, _key.Span);
             Update(d => { d.Entries = restored.Entries; d.Categories = restored.Categories; d.CreatedAt = restored.CreatedAt; });
+        }
+    }
+
+    public byte[] ExportEncrypted()
+    {
+        lock (_gate)
+        {
+            ThrowIfDisposed();
+            if (_key is null) throw new InvalidOperationException("Vault is locked.");
+            byte[] blob = VaultFile.Read(VaultPath);
+            try { VaultFile.Decrypt(blob, _key.Span); return blob; }
+            catch { CryptographicOperations.ZeroMemory(blob); throw; }
         }
     }
 

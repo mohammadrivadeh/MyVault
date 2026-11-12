@@ -3,6 +3,10 @@
 public sealed class VaultEntry
 {
     public DateTimeOffset? DeletedAt { get; set; }
+    public int PasswordHistoryLimit { get; set; } = 5;
+    public EntryKind Kind { get; set; } = EntryKind.Login;
+    public List<CustomField> CustomFields { get; set; } = new();
+    public List<PasswordRevision> PasswordHistory { get; set; } = new();
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Title { get; set; } = string.Empty;
     public string Username { get; set; } = string.Empty;

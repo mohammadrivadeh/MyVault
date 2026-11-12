@@ -48,4 +48,5 @@ jobs:
           name: windows-results-and-build
           path: |
             **/TestResults/*.trx
+            **/TestResults/*.png
             artifacts/MyVault-win-x64/**

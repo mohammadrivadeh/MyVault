@@ -39,7 +39,7 @@ public sealed class ChangePasswordViewModel : ObservableObject
     public string? ErrorText
     {
         get => _errorText;
-        set => SetProperty(ref _errorText, value);
+        set => SetProperty(ref _errorText, value is null ? null : MyVault.App.Services.LocalizationService.Text(value));
     }
 
     public bool IsBusy

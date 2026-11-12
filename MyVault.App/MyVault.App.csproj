@@ -21,4 +21,6 @@
 		<ProjectReference Include="..\MyVault.Core\MyVault.Core.csproj" />
 	</ItemGroup>
 
+  <ItemGroup><PackageReference Include="ZXing.Net" Version="0.16.11" /></ItemGroup>
+  <ItemGroup><EmbeddedResource Include="Resources/fa.json" /><EmbeddedResource Include="Resources/en.json" /></ItemGroup>
 </Project>

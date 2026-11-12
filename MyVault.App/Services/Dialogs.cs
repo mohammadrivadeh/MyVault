@@ -40,7 +40,7 @@ public static class Dialogs
 
     private static bool Show(string message, string title, DialogIcon icon, DialogButtons buttons, Window? owner)
     {
-        var dialog = new Views.MessageDialog(message, title, icon, buttons)
+        var dialog = new Views.MessageDialog(LocalizationService.Text(message), LocalizationService.Text(title), icon, buttons)
         {
             Owner = owner ?? Application.Current?.MainWindow
         };

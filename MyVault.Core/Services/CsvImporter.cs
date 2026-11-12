@@ -1,5 +1,5 @@
 ﻿using MyVault.Core.Models;
-using System.Net.ServerSentEvents;
+
 
 namespace MyVault.Core.Services;
 
@@ -17,20 +17,24 @@ public sealed class CsvImportPreview
     }
 }
 
+public enum CsvSource { Auto, Generic, Chrome, Bitwarden, OnePassword }
+
 public static class CsvImporter
 {
-    public static CsvImportPreview Analyze(string csvText)
+    public static CsvImportPreview Analyze(string csvText, CsvSource source = CsvSource.Auto)
     {
         var rows = CsvParser.Parse(csvText);
         if (rows.Count == 0)
             throw new InvalidDataException("CSV file is empty.");
 
         var header = rows[0];
+        if (source == CsvSource.Auto)
+            source = header.Any(h => h.Trim().Equals("login_username", StringComparison.OrdinalIgnoreCase)) ? CsvSource.Bitwarden : CsvSource.Generic;
 
         int titleIdx = FindColumn(header, "title", "name", "account", "site", "item");
-        int userIdx = FindColumn(header, "username", "user", "login", "email", "user name");
-        int passIdx = FindColumn(header, "password", "pass", "pwd");
-        int urlIdx = FindColumn(header, "url", "website", "site_url", "login_uri", "link");
+        int userIdx = FindColumn(header, "username", "user", "login", "email", "user name", "login_username");
+        int passIdx = FindColumn(header, "password", "pass", "pwd", "login_password");
+        int urlIdx = FindColumn(header, "url", "website", "site_url", "login_uri", "link", "login_uri");
         int notesIdx = FindColumn(header, "notes", "note", "comment", "memo", "extra");
         int tagsIdx = FindColumn(header, "tags", "tag", "folder", "category", "group");
 
@@ -38,6 +42,10 @@ public static class CsvImporter
             throw new InvalidDataException(
                 "CSV must contain a 'title' column (or one of: name, account, site, item).");
 
+        int totpIdx = FindColumn(header, "otpAuth", "login_totp", "totp");
+        int typeIdx = FindColumn(header, "type");
+        if (source == CsvSource.Bitwarden && (userIdx < 0 || passIdx < 0)) throw new InvalidDataException("Select a Bitwarden CSV with login_username and login_password columns.");
+        if (source == CsvSource.Chrome && (userIdx < 0 || passIdx < 0 || urlIdx < 0)) throw new InvalidDataException("Select a Chrome CSV with name, url, username and password columns.");
         var entries = new List<VaultEntry>();
         int skipped = 0;
         int dataRows = rows.Count - 1;
@@ -47,6 +55,7 @@ public static class CsvImporter
             var row = rows[r];
             if (IsEmptyRow(row)) { dataRows--; continue; }
 
+            if (source == CsvSource.Bitwarden && typeIdx >= 0 && Get(row, typeIdx) is not ("login" or "note" or "")) { skipped++; continue; }
             string title = Get(row, titleIdx);
             if (string.IsNullOrWhiteSpace(title)) { skipped++; continue; }
 
@@ -69,6 +78,14 @@ public static class CsvImporter
                     .ToList();
             }
 
+            string setup = Get(row, totpIdx).Trim();
+            if (setup.Length > 0)
+            {
+                // Reject unsupported authenticator parameters; never silently attach a wrong code generator.
+                entry.TotpSecret = setup.StartsWith("otpauth://", StringComparison.OrdinalIgnoreCase) ? AuthenticatorSetup.Parse(setup).Secret :
+                    Totp.IsValid(setup) ? setup.Replace(" ", "").ToUpperInvariant() : throw new InvalidDataException("Invalid authenticator key in CSV row " + (r + 1));
+            }
+            if (source == CsvSource.Bitwarden && Get(row, typeIdx) == "note") entry.Kind = EntryKind.SecureNote;
             entries.Add(entry);
         }
 

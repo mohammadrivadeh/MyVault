@@ -1,11 +1,12 @@
 ﻿<views:GlassWindow x:Class="MyVault.App.Views.HelpWindow"
                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:loc="clr-namespace:MyVault.App.Services"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:views="clr-namespace:MyVault.App.Views"
                    mc:Ignorable="d"
-                   Title="Help &amp; Guide"
+                   Title="{loc:Loc Key=k2afe6dca34b9}"
                    Width="580" Height="640">
 
     <Border Background="{DynamicResource App.Background}"
@@ -24,16 +25,16 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0">
-                <TextBlock Text="Help &amp; Guide" FontSize="18" FontWeight="SemiBold"
+                <TextBlock Text="{loc:Loc Key=k2afe6dca34b9}" FontSize="{DynamicResource App.Font.Title}" FontWeight="SemiBold"
                            Foreground="{DynamicResource App.Text}"/>
-                <TextBlock Text="Everything you need to use MyVault." FontSize="12"
+                <TextBlock Text="{loc:Loc Key=k7c22b704c83a}" FontSize="{DynamicResource App.Font.Small}"
                            Foreground="{DynamicResource App.TextMuted}" Margin="0,4,0,16"/>
             </StackPanel>
 
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                 <StackPanel>
 
-                    <TextBlock Text=" Keyboard shortcuts" FontSize="14" FontWeight="SemiBold"
+                    <TextBlock Text="{loc:Loc Key=ke9bef0b0f3c2}" FontSize="{DynamicResource App.Font.Body}" FontWeight="SemiBold"
                                Foreground="{DynamicResource App.Text}" Margin="0,0,0,10"/>
 
                     <Border Background="{DynamicResource App.SurfaceGlass}" CornerRadius="8"
@@ -53,70 +54,52 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Ctrl + N" FontWeight="SemiBold"
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Loc Key=kb0e94028b8ba}" FontWeight="SemiBold"
                                        Foreground="{DynamicResource App.Accent}" Margin="0,0,0,6"/>
-                            <TextBlock Grid.Row="0" Grid.Column="1" Text="Create a new entry"
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{loc:Loc Key=kb3b428605fcf}"
                                        Foreground="{DynamicResource App.Text}" Margin="0,0,0,6"/>
 
-                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Ctrl + F" FontWeight="SemiBold"
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="{loc:Loc Key=k7a3717c57d33}" FontWeight="SemiBold"
                                        Foreground="{DynamicResource App.Accent}" Margin="0,0,0,6"/>
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="Focus the search box"
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{loc:Loc Key=k7bef9b9b8e8b}"
                                        Foreground="{DynamicResource App.Text}" Margin="0,0,0,6"/>
 
-                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Ctrl + L" FontWeight="SemiBold"
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Loc Key=kccd3f60f5fce}" FontWeight="SemiBold"
                                        Foreground="{DynamicResource App.Accent}" Margin="0,0,0,6"/>
-                            <TextBlock Grid.Row="2" Grid.Column="1" Text="Lock the vault immediately"
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{loc:Loc Key=k773f58b4480b}"
                                        Foreground="{DynamicResource App.Text}" Margin="0,0,0,6"/>
 
-                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Enter" FontWeight="SemiBold"
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="{loc:Loc Key=kdc8659db6d41}" FontWeight="SemiBold"
                                        Foreground="{DynamicResource App.Accent}" Margin="0,0,0,6"/>
-                            <TextBlock Grid.Row="3" Grid.Column="1" Text="Edit the selected entry"
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{loc:Loc Key=k2e6b7214044c}"
                                        Foreground="{DynamicResource App.Text}" Margin="0,0,0,6"/>
 
-                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Delete" FontWeight="SemiBold"
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="{loc:Loc Key=ke2d0a54968ea}" FontWeight="SemiBold"
                                        Foreground="{DynamicResource App.Accent}" Margin="0,0,0,6"/>
-                            <TextBlock Grid.Row="4" Grid.Column="1" Text="Delete the selected entry"
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{loc:Loc Key=k006698983c7c}"
                                        Foreground="{DynamicResource App.Text}" Margin="0,0,0,6"/>
 
-                            <TextBlock Grid.Row="5" Grid.Column="0" Text="Esc" FontWeight="SemiBold"
+                            <TextBlock Grid.Row="5" Grid.Column="0" Text="{loc:Loc Key=k52f878edb34f}" FontWeight="SemiBold"
                                        Foreground="{DynamicResource App.Accent}"/>
-                            <TextBlock Grid.Row="5" Grid.Column="1" Text="Clear search / close dialog"
+                            <TextBlock Grid.Row="5" Grid.Column="1" Text="{loc:Loc Key=ka5e6d55fdfd6}"
                                        Foreground="{DynamicResource App.Text}"/>
                         </Grid>
                     </Border>
 
-                    <TextBlock Text="How it works" FontSize="14" FontWeight="SemiBold"
+                    <TextBlock Text="{loc:Loc Key=k9c870aa6e5e9}" FontSize="{DynamicResource App.Font.Body}" FontWeight="SemiBold"
                                Foreground="{DynamicResource App.Text}" Margin="0,20,0,10"/>
-                    <TextBlock TextWrapping="Wrap" FontSize="12"
-                               Foreground="{DynamicResource App.TextMuted}" LineHeight="18">
-                        Your vault is encrypted with AES-256-GCM using a key derived from your
-                        master password via Argon2id. The master password is never stored —
-                        if you lose it, the vault cannot be opened by anyone, including you.
-                        <LineBreak/><LineBreak/>
-                        Every time you save, a new random nonce is used and a rotated backup
-                        is created (vault.dat.bak.1 through .bak.5). The clipboard is cleared
-                        automatically after the number of seconds you choose in Settings, and
-                        the vault auto-locks on idle or when Windows locks (Win+L).
-                    </TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="{DynamicResource App.Font.Small}"
+                               Foreground="{DynamicResource App.TextMuted}" LineHeight="18"><Run Text="{loc:Loc Key=k5f1012f91aa4}"/><LineBreak/><LineBreak/><Run Text="{loc:Loc Key=k42cc81064b2f}"/></TextBlock>
 
-                    <TextBlock Text="Features" FontSize="14" FontWeight="SemiBold"
+                    <TextBlock Text="{loc:Loc Key=k5697d03daef4}" FontSize="{DynamicResource App.Font.Body}" FontWeight="SemiBold"
                                Foreground="{DynamicResource App.Text}" Margin="0,20,0,10"/>
-                    <TextBlock TextWrapping="Wrap" FontSize="12"
-                               Foreground="{DynamicResource App.Text}" LineHeight="20">
-                        • Add, edit, and delete password entries
-                        <LineBreak/>• Live search across title, username, URL, notes, tags
-                        <LineBreak/>• Vault Categories filter
-                        <LineBreak/>• Built-in password generator (20 chars, strong)
-                        <LineBreak/>• Password health panel (weak / reused / old)
-                        <LineBreak/>• Encrypted backup export
-                        <LineBreak/>• CSV import / export
-                        <LineBreak/>• Auto-lock, Safe clipboard auto-clear, Win+L lock
-                    </TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="{DynamicResource App.Font.Small}"
+                               Foreground="{DynamicResource App.Text}" LineHeight="20"><Run Text="{loc:Loc Key=ke6c9a249a1cc}"/><LineBreak/><Run Text="{loc:Loc Key=k9577cd7f076e}"/><LineBreak/><Run Text="{loc:Loc Key=ke354ddd9e77e}"/><LineBreak/><Run Text="{loc:Loc Key=k4b92f5800a39}"/><LineBreak/><Run Text="{loc:Loc Key=k0d9eba99cf24}"/><LineBreak/><Run Text="{loc:Loc Key=k45776fef1934}"/><LineBreak/><Run Text="{loc:Loc Key=k4550ffb079ca}"/><LineBreak/><Run Text="{loc:Loc Key=k3d293aa7c9ba}"/></TextBlock>
 
                 </StackPanel>
             </ScrollViewer>
 
-            <Button Grid.Row="2" Content="Close" HorizontalAlignment="Right"
+            <Button Grid.Row="2" Content="{loc:Loc Key=k7d9eb7acb13e}" HorizontalAlignment="Right"
                     Margin="0,16,0,0" IsCancel="True" IsDefault="True" Click="Close_Click"/>
         </Grid>
     </Border>

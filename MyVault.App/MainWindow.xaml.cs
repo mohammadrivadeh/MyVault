@@ -37,6 +37,7 @@ public partial class MainWindow : Window
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
+        AppearanceService.ApplyWindow(this);
         _vm?.InitializeClipboard(this);
         if (_vm is not null)
             ApplyWindowMode(_vm.CurrentScreen is VaultViewModel);

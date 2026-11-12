@@ -19,7 +19,7 @@ public partial class SettingsWindow : GlassWindow
     {
         if (DataContext is SettingsViewModel vm)
         {
-            if (!vm.Apply()) { MyVault.App.Services.Dialogs.Error("Settings could not be saved. Check folder permissions.", "Save failed", this); return; }
+            if (!vm.Apply()) { MyVault.App.Services.Dialogs.Error(vm.ValidationError ?? "Settings could not be saved. Check folder permissions.", "Save failed", this); return; }
             DialogResult = true;
         }
         Close();

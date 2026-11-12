@@ -13,6 +13,7 @@ public sealed class MainViewModel : ObservableObject
     private object? _currentScreen;
     private VaultRepository? _repository;
     private AutoLockService? _autoLock;
+    private ScheduledBackupService? _scheduledBackup;
 
     public MainViewModel()
     {
@@ -46,7 +47,7 @@ public sealed class MainViewModel : ObservableObject
         string vaultPath = GetCurrentVaultPath();
         bool exists = File.Exists(vaultPath);
 
-        var vm = new UnlockViewModel(vaultPath, isCreateMode: !exists);
+        var vm = new UnlockViewModel(vaultPath, isCreateMode: !exists, _settings.Current.RecentVaults);
         vm.Unlocked += OnUnlocked;
         vm.VaultPathChanged += OnVaultPathChanged;
 
@@ -75,6 +76,12 @@ public sealed class MainViewModel : ObservableObject
         }
 
         _repository = repo;
+        _settings.Current.RecentVaults.RemoveAll(p => string.Equals(p, repo.VaultPath, StringComparison.OrdinalIgnoreCase));
+        _settings.Current.RecentVaults.Insert(0, repo.VaultPath);
+        _settings.Current.RecentVaults = _settings.Current.RecentVaults.Take(8).ToList();
+        _settings.Save();
+        _scheduledBackup = new ScheduledBackupService(repo, _settings);
+        _ = _scheduledBackup.RunDueAsync(DateTimeOffset.UtcNow);
         _autoLock = new AutoLockService(_settings.Current.AutoLockMinutes);
 
         var vaultVm = new VaultViewModel(repo, _clipboard, _settings, _autoLock);
@@ -93,6 +100,8 @@ public sealed class MainViewModel : ObservableObject
 
     private void CleanupVaultSession()
     {
+        _scheduledBackup?.Dispose();
+        _scheduledBackup = null;
         _autoLock?.Dispose();
         _autoLock = null;
 

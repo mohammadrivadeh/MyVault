@@ -18,12 +18,19 @@ public sealed class UnlockViewModel : ObservableObject
     private bool _isBusy;
     private bool _isCreateMode;
 
-    public UnlockViewModel(string vaultPath, bool isCreateMode)
+    public UnlockViewModel(string vaultPath, bool isCreateMode, IReadOnlyList<string>? recentVaults = null)
     {
         _vaultPath = vaultPath;
+        RecentVaults = recentVaults?.ToList() ?? new();
         _defaultVaultPath = Services.VaultPaths.GetVaultFile();
         _isCreateMode = isCreateMode;
 
+        OpenRecentCommand = new RelayCommand(_ =>
+        {
+            if (string.IsNullOrWhiteSpace(SelectedRecent)) return;
+            try { VaultFile.ReadHeader(VaultFile.Read(SelectedRecent)); Password = ""; ConfirmPassword = ""; ErrorText = null; SetVaultPath(SelectedRecent, false); }
+            catch (Exception ex) when (ex is VaultException or ArgumentException) { ErrorText = "Cannot open recent vault. Choose it again or check that it still exists."; }
+        }, _ => !IsBusy && SelectedRecent is not null);
         UnlockCommand = new RelayCommand(_ => _ = UnlockOrCreateAsync(), _ => CanSubmit());
         CloseAppCommand = new RelayCommand(_ => CloseApp());
         ChooseVaultCommand = new RelayCommand(_ => ChooseVault(), _ => !IsBusy);
@@ -51,8 +58,8 @@ public sealed class UnlockViewModel : ObservableObject
 
     public bool IsUnlockMode => !IsCreateMode;
 
-    public string Subtitle => IsCreateMode ? "Create a new vault" : "Unlock your vault";
-    public string ButtonText => IsCreateMode ? "Create Vault" : "Unlock";
+    public string Subtitle => MyVault.App.Services.LocalizationService.Text(IsCreateMode ? "Create a new vault" : "Unlock your vault");
+    public string ButtonText => MyVault.App.Services.LocalizationService.Text(IsCreateMode ? "Create Vault" : "Unlock");
 
     public string CurrentVaultPath => _vaultPath;
     public string VaultDisplay => Path.GetFileName(_vaultPath);
@@ -77,7 +84,7 @@ public sealed class UnlockViewModel : ObservableObject
     public string? ErrorText
     {
         get => _errorText;
-        set => SetProperty(ref _errorText, value);
+        set => SetProperty(ref _errorText, value is null ? null : MyVault.App.Services.LocalizationService.Text(value));
     }
 
     public bool IsBusy
@@ -97,6 +104,9 @@ public sealed class UnlockViewModel : ObservableObject
 
     public ICommand UnlockCommand { get; }
     public ICommand CloseAppCommand { get; }
+    public IReadOnlyList<string> RecentVaults { get; }
+    public string? SelectedRecent { get; set; }
+    public ICommand OpenRecentCommand { get; }
     public ICommand CreateVaultCommand { get; }
     public ICommand ChooseVaultCommand { get; }
     public ICommand UseDefaultVaultCommand { get; }
@@ -127,7 +137,7 @@ public sealed class UnlockViewModel : ObservableObject
 
     private void ChooseNewVault()
     {
-        var dialog = new SaveFileDialog { Title = "Create a separate vault", Filter = "MyVault vault|*.vault", FileName = "new-vault.vault" };
+        var dialog = new SaveFileDialog { Title = MyVault.App.Services.LocalizationService.Text("Create a separate vault"), Filter = "MyVault vault|*.vault", FileName = "new-vault.vault" };
         if (dialog.ShowDialog() != true) return;
         if (File.Exists(dialog.FileName)) { ErrorText = "Choose a new filename. Existing vaults are never overwritten."; return; }
         ErrorText = null; Password = ""; ConfirmPassword = "";
@@ -138,7 +148,7 @@ public sealed class UnlockViewModel : ObservableObject
     {
         var dlg = new OpenFileDialog
         {
-            Title = "Choose a vault file",
+            Title = MyVault.App.Services.LocalizationService.Text("Choose a vault file"),
             Filter = "MyVault vault (*.dat;*.vault)|*.dat;*.vault|All files (*.*)|*.*",
             CheckFileExists = true,
             Multiselect = false
@@ -156,7 +166,7 @@ public sealed class UnlockViewModel : ObservableObject
         // Validate that it actually looks like a vault.
         try
         {
-            byte[] blob = File.ReadAllBytes(dlg.FileName);
+            byte[] blob = VaultFile.Read(dlg.FileName);
             VaultFile.ReadHeader(blob);
         }
         catch (VaultException ex)

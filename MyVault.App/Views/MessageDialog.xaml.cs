@@ -77,13 +77,13 @@ public partial class MessageDialog : GlassWindow
                 break;
 
             case DialogButtons.YesNo:
-                OkButton.Content = "Yes";
+                OkButton.Content = MyVault.App.Services.LocalizationService.Text("Yes");
                 OkButton.Visibility = Visibility.Visible;
                 NoButton.Visibility = Visibility.Visible;
                 break;
 
             case DialogButtons.YesNoCancel:
-                OkButton.Content = "Yes";
+                OkButton.Content = MyVault.App.Services.LocalizationService.Text("Yes");
                 OkButton.Visibility = Visibility.Visible;
                 NoButton.Visibility = Visibility.Visible;
                 CancelButton.Visibility = Visibility.Visible;

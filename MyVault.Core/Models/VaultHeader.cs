@@ -10,7 +10,7 @@ namespace MyVault.Core.Models;
 public sealed class VaultHeader
 {
     public const string CurrentMagic = "MVLT1";
-    public const int CurrentFormatVersion = 1;
+    public const int CurrentFormatVersion = 2;
     public const string Argon2idKdf = "argon2id";
 
     public string Magic { get; set; } = CurrentMagic;
@@ -31,7 +31,7 @@ public sealed class VaultHeader
         if (Magic != CurrentMagic)
             throw new VaultException(VaultError.Corrupted, "Not a valid vault file.");
 
-        if (FormatVersion != CurrentFormatVersion)
+        if (FormatVersion < 1 || FormatVersion > CurrentFormatVersion)
             throw new VaultException(
                 VaultError.UnsupportedVersion,
                 $"Vault format version {FormatVersion} is not supported by this app version.");

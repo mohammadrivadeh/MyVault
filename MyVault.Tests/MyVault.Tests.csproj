@@ -6,4 +6,4 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.1"><PrivateAssets>all</PrivateAssets></PackageReference>
     <ProjectReference Include="../MyVault.Core/MyVault.Core.csproj" />
   </ItemGroup>
-<ItemGroup><None Include="../MyVault.App/Themes/*Palette.xaml" Link="Palettes/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" /></ItemGroup></Project>
+<ItemGroup><None Include="../MyVault.App/Themes/*Palette.xaml" Link="Palettes/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" /></ItemGroup><ItemGroup><None Include="../MyVault.App/Resources/*.json" Link="Locales/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest"/><None Include="../MyVault.App/Views/*.xaml" Link="Views/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest"/></ItemGroup></Project>

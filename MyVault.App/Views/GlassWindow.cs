@@ -25,6 +25,7 @@ public class GlassWindow : Window
             CornerRadius = new CornerRadius(14)
         });
 
+        AppearanceService.ApplyWindow(this);
         Loaded += (_, _) => MotionService.Reveal(this);
         SourceInitialized += (_, _) =>
         {

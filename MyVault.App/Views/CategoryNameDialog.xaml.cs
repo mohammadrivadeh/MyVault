@@ -14,7 +14,7 @@ public partial class CategoryNameDialog : GlassWindow
         InitializeComponent();
 
         Title = title;
-        TitleText.Text = title;
+        TitleText.Text = MyVault.App.Services.LocalizationService.Text(title);
         NameBox.Text = initialName;
         _existingNames = new HashSet<string>(existingNames, StringComparer.OrdinalIgnoreCase);
 
