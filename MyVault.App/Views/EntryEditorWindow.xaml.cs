@@ -34,6 +34,16 @@ public partial class EntryEditorWindow : GlassWindow
         TitleBox.SelectAll();
     }
 
+    protected override void OnClosing(CancelEventArgs e)
+    {
+        if (DialogResult != true && Vm is { HasUnsavedChanges: true })
+        {
+            bool discard = MyVault.App.Services.Dialogs.Confirm("Discard unsaved changes?", "Unsaved changes", this);
+            // Session locking clears DataContext and must never be vetoed by a discard prompt.
+            if (Vm is not null && !discard) e.Cancel = true;
+        }
+        base.OnClosing(e);
+    }
     protected override void OnClosed(EventArgs e)
     {
         if (Vm is not null) Vm.PropertyChanged -= Vm_PropertyChanged;
@@ -96,6 +106,37 @@ public partial class EntryEditorWindow : GlassWindow
     {
         if (!_syncing && Vm is not null) Vm.TotpSecret = TotpBox.Password;
     }
+    private async void ImportQr_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog { Title = MyVault.App.Services.LocalizationService.Text("Import authenticator QR image"), Filter = "Images|*.png;*.jpg;*.jpeg;*.bmp" };
+        if (dialog.ShowDialog() != true) return;
+        if (sender is not System.Windows.Controls.Button button) return;
+        button.IsEnabled = false;
+        try
+        {
+            var setup = await System.Threading.Tasks.Task.Run(() => MyVault.App.Services.QrSetupReader.Read(dialog.FileName));
+            if (Vm is not { } vm) return;
+            if (vm.TotpSecret.Length > 0 && !MyVault.App.Services.Dialogs.Confirm("Replace this entry's authenticator key?", "Replace authenticator key", this)) return;
+            if (Vm is null) return;
+            vm.TotpSecret = setup.Secret; TotpBox.Password = setup.Secret;
+            if (string.IsNullOrWhiteSpace(vm.Title)) vm.Title = setup.Account;
+        }
+        catch (Exception ex) when (ex is ArgumentException or System.IO.IOException or NotSupportedException or System.IO.FileFormatException)
+        { if (Vm is not null) MyVault.App.Services.Dialogs.Error("Could not import the QR image. " + ex.Message, "QR import failed", this); }
+        finally { button.IsEnabled = true; }
+    }
+    private void ImportLink_Click(object sender, RoutedEventArgs e)
+    {
+        if (Vm is not { } vm) return;
+        try
+        {
+            var setup = MyVault.Core.Services.AuthenticatorSetup.Parse(SetupLinkBox.Password);
+            if (vm.TotpSecret.Length > 0 && !MyVault.App.Services.Dialogs.Confirm("Replace this entry's authenticator key?", "Replace authenticator key", this)) return;
+            if (Vm is null) return;
+            vm.TotpSecret = setup.Secret; TotpBox.Password = setup.Secret; SetupLinkBox.Clear();
+        }
+        catch (ArgumentException ex) { MyVault.App.Services.Dialogs.Error(ex.Message, "Setup link not supported", this); }
+    }
     private void Save_Click(object sender, RoutedEventArgs e)
     {
         if (Vm is null) return;
@@ -116,7 +157,6 @@ public partial class EntryEditorWindow : GlassWindow
 
     private void Cancel_Click(object sender, RoutedEventArgs e)
     {
-        DialogResult = false;
         Close();
     }
 }

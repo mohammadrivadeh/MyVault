@@ -24,6 +24,17 @@ public sealed class DesignTests
             Assert.True(Contrast(colors["App.Error"], colors["App.ErrorBg"]) >= 4.5, $"{file}: error");
         }
     }
+    [Fact]
+    public void LocalizationCatalogsCoverBindingsWithoutTranslatingCredentialData()
+    {
+        var en = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Locales/en.json")))!;
+        var fa = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Locales/fa.json")))!;
+        Assert.Equal(en.Keys.Order(), fa.Keys.Order());
+        var unchanged = new HashSet<string> { "AES-256-GCM + Argon2id", "Bitwarden", "Chrome", "Ctrl + F", "Ctrl + L", "Ctrl + N", "MyVault", @"MyVault\vault.dat", "OnePassword" };
+        foreach (var pair in en) Assert.True(unchanged.Contains(pair.Value) || fa[pair.Key] != pair.Value, "Missing Persian translation: " + pair.Value);
+        foreach (string file in Directory.GetFiles(Path.Combine(AppContext.BaseDirectory, "Views"), "*.xaml"))
+            foreach (System.Text.RegularExpressions.Match match in System.Text.RegularExpressions.Regex.Matches(File.ReadAllText(file), @"loc:Loc Key=(k[a-f0-9]+)")) Assert.True(en.ContainsKey(match.Groups[1].Value), "Unknown localization key in " + file);
+    }
     private static double Contrast(string a, string b)
     {
         double first = Luminance(a), second = Luminance(b);

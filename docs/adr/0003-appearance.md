@@ -1,6 +1,6 @@
 # ADR 0003: Semantic palettes and shared motion policy
 
-Status: Accepted
+Status: Accepted for the initial delivery; subsequent extensions are recorded in [0007-personalization-and-actions](0007-personalization-and-actions.md).
 
 Context: The initial theme service forced one theme and several dialog colors were fixed. Long introductory animation could delay routine access.
 

@@ -67,6 +67,7 @@ public static class VaultFile
         ArgumentNullException.ThrowIfNull(header);
         header.Validate();
         document.Validate();
+        if (document.Version != header.FormatVersion) throw new VaultException(VaultError.UnsupportedVersion, "Header and document versions do not match.");
 
         var headerJson = JsonSerializer.SerializeToUtf8Bytes(header, JsonOptions);
         int headerLen = headerJson.Length;
@@ -134,6 +135,7 @@ public static class VaultFile
             if (doc is null)
                 throw new VaultException(VaultError.Corrupted, "Empty document.");
             doc.Validate();
+            if (doc.Version != ReadHeader(blob).FormatVersion) throw new VaultException(VaultError.UnsupportedVersion, "Header and document versions do not match.");
             return doc;
         }
         finally

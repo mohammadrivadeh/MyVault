@@ -8,12 +8,14 @@ namespace MyVault.App.ViewModels;
 public sealed class IntOption
 {
     public int Value { get; }
-    public string Label { get; }
-    public IntOption(int value, string label) { Value = value; Label = label; }
+    private readonly string _label;
+    public string Label => LocalizationService.Text(_label);
+    public IntOption(int value, string label) { Value = value; _label = label; }
 }
 
 public sealed class SettingsViewModel : ObservableObject
 {
+    private readonly AppSettings _originalAppearance;
     private readonly SettingsService _settings;
     private readonly VaultRepository _repository;
 
@@ -26,6 +28,7 @@ public sealed class SettingsViewModel : ObservableObject
 
     public SettingsViewModel(SettingsService settings, VaultRepository repository)
     {
+        _originalAppearance = AppearanceService.Copy(settings.Current);
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
 
@@ -34,6 +37,13 @@ public sealed class SettingsViewModel : ObservableObject
         _autoLockMinutes = settings.Current.AutoLockMinutes;
         _clearClipboardSeconds = settings.Current.ClearClipboardSeconds;
 
+        _accent = settings.Current.Accent; _textSize = settings.Current.TextSize; _density = settings.Current.Density; _language = settings.Current.Language;
+        BackupDirectory = settings.Current.BackupDirectory; BackupMinutes = settings.Current.BackupMinutes; BackupKeep = settings.Current.BackupKeep;
+        ChooseBackupFolderCommand = new RelayCommand(() =>
+        {
+            var dialog = new Microsoft.Win32.OpenFolderDialog { Title = MyVault.App.Services.LocalizationService.Text("Choose encrypted backup folder") };
+            if (dialog.ShowDialog() == true) BackupDirectory = dialog.FolderName;
+        });
         ChangePasswordCommand = new RelayCommand(_ => OpenChangePassword());
     }
 
@@ -72,21 +82,40 @@ public sealed class SettingsViewModel : ObservableObject
 
     public IReadOnlyList<string> Themes => ThemeService.Themes;
     public IReadOnlyList<string> MotionOptions { get; } = new[] { "System", "Full", "Off" };
-    public string Theme { get => _theme; set { if (SetProperty(ref _theme, value)) ThemeService.Apply(value); } }
-    public string Motion { get => _motion; set { if (SetProperty(ref _motion, value)) MotionService.Mode = value; } }
-    public void RevertPreview() { ThemeService.Apply(_originalTheme); MotionService.Mode = _originalMotion; }
+    private string _accent = "Palette", _density = "Comfortable", _language = "en", _backupDirectory = "";
+    private double _textSize = 13;
+    public IReadOnlyList<string> Accents => AppearanceService.Accents;
+    public IReadOnlyList<string> Densities { get; } = new[] { "Compact", "Comfortable" };
+    public IReadOnlyList<string> Languages { get; } = new[] { "en", "fa" };
+    public IReadOnlyList<double> TextSizes { get; } = new double[] { 12, 13, 14, 16, 18 };
+    public IReadOnlyList<int> BackupIntervals { get; } = new[] { 0, 15, 30, 60, 240, 1440 };
+    public IReadOnlyList<int> BackupRetention { get; } = new[] { 3, 5, 10, 20, 50 };
+    public string Theme { get => _theme; set { if (SetProperty(ref _theme, value)) Preview(); } }
+    public string Motion { get => _motion; set { if (SetProperty(ref _motion, value)) Preview(); } }
+    public string Accent { get => _accent; set { if (SetProperty(ref _accent, value)) Preview(); } }
+    public string Density { get => _density; set { if (SetProperty(ref _density, value)) Preview(); } }
+    public string Language { get => _language; set { if (SetProperty(ref _language, value)) Preview(); } }
+    public double TextSize { get => _textSize; set { if (SetProperty(ref _textSize, value)) Preview(); } }
+    public string BackupDirectory { get => _backupDirectory; set => SetProperty(ref _backupDirectory, value); }
+    public int BackupMinutes { get; set; }
+    public int BackupKeep { get; set; }
+    public string LastBackupStatus => _settings.Current.LastBackupStatus;
+    public RelayCommand ChooseBackupFolderCommand { get; }
+    private void WriteAppearance(AppSettings settings)
+    { settings.Theme = Theme; settings.Motion = Motion; settings.Accent = Accent; settings.TextSize = TextSize; settings.Density = Density; settings.Language = Language; }
+    private void Preview() { var preview = AppearanceService.Copy(_originalAppearance); WriteAppearance(preview); AppearanceService.Apply(preview); }
+    public void RevertPreview() => AppearanceService.Apply(_originalAppearance);
     public RelayCommand ChangePasswordCommand { get; }
-
+    public string? ValidationError {get;private set;}
     public bool Apply()
     {
-        var before = (_settings.Current.AutoLockMinutes, _settings.Current.ClearClipboardSeconds, _settings.Current.Theme, _settings.Current.Motion);
-        _settings.Current.AutoLockMinutes = AutoLockMinutes;
-        _settings.Current.ClearClipboardSeconds = ClearClipboardSeconds;
-        _settings.Current.Theme = Theme;
-        _settings.Current.Motion = Motion;
-        if (_settings.Save()) return true;
-        (_settings.Current.AutoLockMinutes, _settings.Current.ClearClipboardSeconds, _settings.Current.Theme, _settings.Current.Motion) = before;
-        return false;
+        ValidationError=null;
+        if (BackupMinutes > 0 && string.IsNullOrWhiteSpace(BackupDirectory)) {ValidationError=LocalizationService.Text("Choose a backup folder before enabling scheduled backups.");return false;}
+        return _settings.Update(settings =>
+        {
+            WriteAppearance(settings); settings.AutoLockMinutes = AutoLockMinutes; settings.ClearClipboardSeconds = ClearClipboardSeconds;
+            settings.BackupDirectory = BackupDirectory; settings.BackupMinutes = BackupMinutes; settings.BackupKeep = BackupKeep;
+        });
     }
 
     private void OpenChangePassword()

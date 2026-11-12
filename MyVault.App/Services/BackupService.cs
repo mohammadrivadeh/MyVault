@@ -26,14 +26,7 @@ public sealed class BackupService
 
         if (string.Equals(Path.GetFullPath(destinationPath), _repository.VaultPath, StringComparison.OrdinalIgnoreCase))
             throw new InvalidOperationException("Choose a destination different from the active vault.");
-        byte[] blob = VaultFile.Read(_repository.VaultPath);
-
-        if (!_repository.VerifyExternalVault(blob))
-        {
-            Array.Clear(blob);
-            throw new InvalidOperationException(
-                "The current vault file could not be verified — refusing to save an invalid backup.");
-        }
+        byte[] blob = _repository.ExportEncrypted();
 
         try
         {
@@ -42,7 +35,7 @@ public sealed class BackupService
 
             VaultFile.WriteAtomic(destinationPath, blob, maxBackups: 0);
             byte[] copy = VaultFile.Read(destinationPath);
-            try { if (!copy.AsSpan().SequenceEqual(blob) || !_repository.VerifyExternalVault(copy)) throw new IOException("Backup verification failed."); }
+            try { if (!copy.AsSpan().SequenceEqual(blob)) throw new IOException("Backup verification failed."); }
             finally { Array.Clear(copy); }
         }
         finally

@@ -1,6 +1,6 @@
 # ADR 0001: Preserve MVLT1 and bound untrusted work
 
-Status: Accepted
+Status: Accepted for the initial delivery; subsequent extensions are recorded in [0006-version-two-records](0006-version-two-records.md).
 
 Context: Existing vaults use an authenticated JSON header and AES-GCM payload. KDF parameters must be consumed before authentication and previously had only lower bounds.
 

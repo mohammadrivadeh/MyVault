@@ -1,14 +1,15 @@
 ﻿<views:GlassWindow x:Class="MyVault.App.Views.SettingsWindow"
                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:loc="clr-namespace:MyVault.App.Services"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:vm="clr-namespace:MyVault.App.ViewModels"
                    xmlns:views="clr-namespace:MyVault.App.Views"
                    mc:Ignorable="d"
                    d:DataContext="{d:DesignInstance Type=vm:SettingsViewModel}"
-                   Title="Settings"
-                   Width="440"
+                   Title="{loc:Loc Key=k74a883a037bc}"
+                   Width="500" MaxHeight="780"
                    SizeToContent="Height">
 
     <Border Background="{DynamicResource App.Background}"
@@ -21,18 +22,19 @@
 
         <Grid Margin="20">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0">
-                <TextBlock Text="Settings"
-                           FontSize="16" FontWeight="SemiBold"
+            <ScrollViewer Grid.Row="0" MaxHeight="620" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <TextBlock Text="{loc:Loc Key=k74a883a037bc}"
+                           FontSize="{DynamicResource App.Font.Title}" FontWeight="SemiBold"
                            Foreground="{DynamicResource App.Text}"
                            Margin="0,0,0,14"/>
 
-                <TextBlock Text="Auto-lock after"
-                           FontSize="11" FontWeight="SemiBold"
+                <TextBlock Text="{loc:Loc Key=k4eb234c2a2e9}"
+                           FontSize="{DynamicResource App.Font.Small}" FontWeight="SemiBold"
                            Foreground="{DynamicResource App.TextMuted}"
                            Margin="0,0,0,4"/>
                 <ComboBox ItemsSource="{Binding AutoLockOptions}"
@@ -40,8 +42,8 @@
                           SelectedValuePath="Value"
                           DisplayMemberPath="Label"/>
 
-                <TextBlock Text="Clear clipboard after"
-                           FontSize="11" FontWeight="SemiBold"
+                <TextBlock Text="{loc:Loc Key=k56e3cddf7e09}"
+                           FontSize="{DynamicResource App.Font.Small}" FontWeight="SemiBold"
                            Foreground="{DynamicResource App.TextMuted}"
                            Margin="0,10,0,4"/>
                 <ComboBox ItemsSource="{Binding ClearClipboardOptions}"
@@ -49,32 +51,41 @@
                           SelectedValuePath="Value"
                           DisplayMemberPath="Label"/>
 
-                <TextBlock Text="Color theme (live preview)" Foreground="{DynamicResource App.TextMuted}" Margin="0,12,0,4"/>
-                <ComboBox ItemsSource="{Binding Themes}" SelectedItem="{Binding Theme, Mode=TwoWay}"/>
-                <TextBlock Text="Motion (always respects Windows reduced motion)" Foreground="{DynamicResource App.TextMuted}" Margin="0,12,0,4" TextWrapping="Wrap"/>
-                <ComboBox ItemsSource="{Binding MotionOptions}" SelectedItem="{Binding Motion, Mode=TwoWay}"/>
-                <TextBlock Text="Master password"
-                           FontSize="11" FontWeight="SemiBold"
+                <TextBlock Text="{loc:Loc Key=kb0ba4d3fcdfc}" Foreground="{DynamicResource App.TextMuted}" Margin="0,12,0,4"/>
+                <ComboBox ItemsSource="{Binding Themes}" SelectedItem="{Binding Theme, Mode=TwoWay}"><ComboBox.ItemTemplate><DataTemplate><TextBlock><TextBlock.Text><MultiBinding Converter="{StaticResource ChoiceLabel}"><Binding/><Binding Source="{x:Static loc:LocalizationService.Instance}" Path="Language"/></MultiBinding></TextBlock.Text></TextBlock></DataTemplate></ComboBox.ItemTemplate></ComboBox>
+                <TextBlock Text="{loc:Loc Key=kffd0472f7fa7}" Foreground="{DynamicResource App.TextMuted}" Margin="0,12,0,4" TextWrapping="Wrap"/>
+                <ComboBox ItemsSource="{Binding MotionOptions}" SelectedItem="{Binding Motion, Mode=TwoWay}"><ComboBox.ItemTemplate><DataTemplate><TextBlock><TextBlock.Text><MultiBinding Converter="{StaticResource ChoiceLabel}"><Binding/><Binding Source="{x:Static loc:LocalizationService.Instance}" Path="Language"/></MultiBinding></TextBlock.Text></TextBlock></DataTemplate></ComboBox.ItemTemplate></ComboBox>
+                <TextBlock Text="{loc:Loc Key=kbaeefbad50a3}" Margin="0,12,0,4"/><ComboBox ItemsSource="{Binding Accents}" SelectedItem="{Binding Accent}"><ComboBox.ItemTemplate><DataTemplate><TextBlock><TextBlock.Text><MultiBinding Converter="{StaticResource ChoiceLabel}"><Binding/><Binding Source="{x:Static loc:LocalizationService.Instance}" Path="Language"/></MultiBinding></TextBlock.Text></TextBlock></DataTemplate></ComboBox.ItemTemplate></ComboBox>
+                <TextBlock Text="{loc:Loc Key=kd68761cc1eb2}" Margin="0,12,0,4"/><ComboBox ItemsSource="{Binding TextSizes}" SelectedItem="{Binding TextSize}"/>
+                <TextBlock Text="{loc:Loc Key=k93a6a5e7e8bb}" Margin="0,12,0,4"/><ComboBox ItemsSource="{Binding Densities}" SelectedItem="{Binding Density}"><ComboBox.ItemTemplate><DataTemplate><TextBlock><TextBlock.Text><MultiBinding Converter="{StaticResource ChoiceLabel}"><Binding/><Binding Source="{x:Static loc:LocalizationService.Instance}" Path="Language"/></MultiBinding></TextBlock.Text></TextBlock></DataTemplate></ComboBox.ItemTemplate></ComboBox>
+                <TextBlock Text="{loc:Loc Key=k33fb3da14698}" Margin="0,12,0,4"/><ComboBox ItemsSource="{Binding Languages}" SelectedItem="{Binding Language}"><ComboBox.ItemTemplate><DataTemplate><TextBlock><TextBlock.Text><MultiBinding Converter="{StaticResource ChoiceLabel}"><Binding/><Binding Source="{x:Static loc:LocalizationService.Instance}" Path="Language"/></MultiBinding></TextBlock.Text></TextBlock></DataTemplate></ComboBox.ItemTemplate></ComboBox>
+                <TextBlock Text="{loc:Loc Key=k4b14f60e096e}" Margin="0,16,0,8" FontWeight="SemiBold"/>
+                <TextBlock Text="{loc:Loc Key=kef5a4094ce73}"/><ComboBox ItemsSource="{Binding BackupIntervals}" SelectedItem="{Binding BackupMinutes}" Margin="0,4,0,8"/>
+                <TextBlock Text="{loc:Loc Key=k71efb320a68a}"/><ComboBox ItemsSource="{Binding BackupRetention}" SelectedItem="{Binding BackupKeep}" Margin="0,4,0,8"/>
+                <TextBox Text="{Binding BackupDirectory,UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" FlowDirection="LeftToRight"/>
+                <Button Content="{loc:Loc Key=k4300a6ec57cb}" Command="{Binding ChooseBackupFolderCommand}" Margin="0,4,0,8"/>
+                <TextBlock Text="{loc:Loc Key=k9b715127c7db}" TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}"/>
+                <TextBlock Text="{Binding LastBackupStatus}" TextWrapping="Wrap" Margin="0,8" Foreground="{DynamicResource App.TextMuted}"/>
+                <TextBlock Text="{loc:Loc Key=kf4c2ee7d031e}"
+                           FontSize="{DynamicResource App.Font.Small}" FontWeight="SemiBold"
                            Foreground="{DynamicResource App.TextMuted}"
                            Margin="0,12,0,6"/>
-                <Button Content="Change master password…"
+                <Button Content="{loc:Loc Key=k0924492ad935}"
                         Command="{Binding ChangePasswordCommand}"
                         HorizontalAlignment="Left"
                         Style="{StaticResource PrimaryButton}"/>
 
                 <Border Background="{DynamicResource App.WarningBg}"
                         CornerRadius="6" Padding="10,8" Margin="0,12,0,0">
-                    <TextBlock TextWrapping="Wrap" FontSize="11"
-                               Foreground="{DynamicResource App.Warning}">
-                        The vault also locks automatically when you sign out or lock
-                        Windows (Win+L), regardless of this setting.
-                    </TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="{DynamicResource App.Font.Small}"
+                               Foreground="{DynamicResource App.Warning}" Text="{loc:Loc Key=k9111b416a5eb}"/>
                 </Border>
             </StackPanel>
+            </ScrollViewer>
 
             <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
-                <Button Content="Cancel" IsCancel="True" Click="Cancel_Click" Margin="0,0,8,0"/>
-                <Button Content="Save" IsDefault="True" Click="Save_Click"
+                <Button Content="{loc:Loc Key=k19766ed6ccb2}" IsCancel="True" Click="Cancel_Click" Margin="0,0,8,0"/>
+                <Button Content="{loc:Loc Key=k1509f561f241}" IsDefault="True" Click="Save_Click"
                         Style="{StaticResource PrimaryButton}"/>
             </StackPanel>
         </Grid>

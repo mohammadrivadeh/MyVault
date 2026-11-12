@@ -1,10 +1,12 @@
 ﻿<views:GlassWindow x:Class="MyVault.App.Views.EntryEditorWindow"
                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:loc="clr-namespace:MyVault.App.Services"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:vm="clr-namespace:MyVault.App.ViewModels"
                    xmlns:views="clr-namespace:MyVault.App.Views"
+                   xmlns:services="clr-namespace:MyVault.App.Services"
                    mc:Ignorable="d"
                    d:DataContext="{d:DesignInstance Type=vm:EntryEditorViewModel}"
                    Title="{Binding WindowTitle}"
@@ -26,7 +28,7 @@
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Row="0" Text="{Binding WindowTitle}"
-                       FontSize="16" FontWeight="SemiBold"
+                       FontSize="{DynamicResource App.Font.Title}" FontWeight="SemiBold"
                        Foreground="{DynamicResource App.Text}"
                        Margin="0,0,0,16"/>
 
@@ -47,21 +49,23 @@
 
                     <!-- Row 0: Title | Username -->
                     <StackPanel Grid.Row="0" Grid.Column="0">
-                        <TextBlock Text="Title *" FontSize="11" FontWeight="SemiBold"
+                        <TextBlock Text="{loc:Loc Key=k5b71c546c6b5}" Foreground="{DynamicResource App.TextMuted}" Margin="0,0,0,4"/>
+                        <ComboBox ItemsSource="{Binding Kinds}" SelectedItem="{Binding Kind}" Margin="0,0,0,8"><ComboBox.ItemTemplate><DataTemplate><TextBlock><TextBlock.Text><MultiBinding Converter="{StaticResource ChoiceLabel}"><Binding/><Binding Source="{x:Static loc:LocalizationService.Instance}" Path="Language"/></MultiBinding></TextBlock.Text></TextBlock></DataTemplate></ComboBox.ItemTemplate></ComboBox>
+                        <TextBlock Text="{loc:Loc Key=k4bf07d033e69}" FontSize="{DynamicResource App.Font.Small}" FontWeight="SemiBold"
                                    Foreground="{DynamicResource App.TextMuted}" Margin="0,0,0,4"/>
                         <TextBox x:Name="TitleBox"
                                  Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
 
                     <StackPanel Grid.Row="0" Grid.Column="2">
-                        <TextBlock Text="Username" FontSize="11" FontWeight="SemiBold"
+                        <TextBlock Text="{loc:Loc Key=ke3b89e9d33f8}" FontSize="{DynamicResource App.Font.Small}" FontWeight="SemiBold"
                                    Foreground="{DynamicResource App.TextMuted}" Margin="0,0,0,4"/>
-                        <TextBox Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox FlowDirection="LeftToRight" Language="en-US" Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
 
                     <!-- Row 1: Password (full width) -->
                     <StackPanel Grid.Row="1" Grid.ColumnSpan="3" Margin="0,12,0,0">
-                        <TextBlock Text="Password" FontSize="11" FontWeight="SemiBold"
+                        <TextBlock Text="{loc:Loc Key=ke7cf3ef4f17c}" FontSize="{DynamicResource App.Font.Small}" FontWeight="SemiBold"
                                    Foreground="{DynamicResource App.TextMuted}" Margin="0,0,0,4"/>
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -69,7 +73,7 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <Grid Grid.Column="0">
-                                <PasswordBox x:Name="PwdBox" Padding="10,8,38,8"
+                                <PasswordBox FlowDirection="LeftToRight" Language="en-US" x:Name="PwdBox" Padding="10,8,38,8"
                                              PasswordChanged="PwdBox_PasswordChanged"/>
                                 <TextBox x:Name="RevealBox" Visibility="Collapsed"
                                          Padding="10,8,38,8"
@@ -79,41 +83,42 @@
                                         HorizontalAlignment="Right" VerticalAlignment="Center"
                                         Margin="4,4,4,4"
                                         Click="ToggleReveal_Click"
-                                        ToolTip="Show / hide password">
-                                    <TextBlock Text="  👁" FontSize="14"/>
+                                        ToolTip="{loc:Loc Key=kf43e63f1bf7f}">
+                                    <TextBlock Text="👁" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center" FontSize="{DynamicResource App.Font.Body}"/>
                                 </Button>
                             </Grid>
-                            <Button Grid.Column="1" Content="Generate"
+                            <Button Grid.Column="1" Content="{loc:Loc Key=k49e49bb4401e}"
                                     Margin="6,0,0,0"
                                     Command="{Binding GenerateCommand}"/>
                         </Grid>
-                        <Expander Header="Generator options" Foreground="{DynamicResource App.Text}" Margin="0,8,0,0">
+                        <Expander Header="{loc:Loc Key=k6e3daf0452f2}" Foreground="{DynamicResource App.Text}" Margin="0,8,0,0">
                             <StackPanel>
-                                <TextBlock Text="Length (4–256)"/><TextBox Text="{Binding GeneratorLength}"/>
+                                <TextBlock Text="{loc:Loc Key=kb385f5776560}"/><TextBox Text="{Binding GeneratorLength}"/>
                                 <WrapPanel>
-                                    <CheckBox Content="A–Z" IsChecked="{Binding GenerateUpper}" Margin="4"/>
-                                    <CheckBox Content="a–z" IsChecked="{Binding GenerateLower}" Margin="4"/>
+                                    <CheckBox Content="{loc:Loc Key=kf9f6c8502eb0}" IsChecked="{Binding GenerateUpper}" Margin="4"/>
+                                    <CheckBox Content="{loc:Loc Key=k7f92988ae573}" IsChecked="{Binding GenerateLower}" Margin="4"/>
                                     <CheckBox Content="0–9" IsChecked="{Binding GenerateDigits}" Margin="4"/>
-                                    <CheckBox Content="Symbols" IsChecked="{Binding GenerateSymbols}" Margin="4"/>
-                                    <CheckBox Content="Avoid ambiguous" IsChecked="{Binding AvoidAmbiguous}" Margin="4"/>
+                                    <CheckBox Content="{loc:Loc Key=k9491fc41c391}" IsChecked="{Binding GenerateSymbols}" Margin="4"/>
+                                    <CheckBox Content="{loc:Loc Key=kdd44eca9393c}" IsChecked="{Binding AvoidAmbiguous}" Margin="4"/>
                                 </WrapPanel>
                             </StackPanel>
                         </Expander>
                         <TextBlock Text="{Binding PasswordStrengthLabel}"
-                                   FontSize="11" Foreground="{DynamicResource App.TextMuted}"
+                                   FontSize="{DynamicResource App.Font.Small}" Foreground="{DynamicResource App.TextMuted}"
                                    Margin="0,4,0,0"/>
+                        <TextBlock Text="{loc:Loc Key=kc2744b81fed1}" TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}" FontSize="{DynamicResource App.Font.Small}" Margin="0,4,0,0"/>
                     </StackPanel>
 
                     <!-- Row 2: URL | Category -->
                     <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,12,0,0">
-                        <TextBlock Text="URL" FontSize="11" FontWeight="SemiBold"
+                        <TextBlock Text="{loc:Loc Key=ke7a241debad5}" FontSize="{DynamicResource App.Font.Small}" FontWeight="SemiBold"
                Foreground="{DynamicResource App.TextMuted}" Margin="0,0,0,4"/>
-                        <TextBox Text="{Binding Url, UpdateSourceTrigger=PropertyChanged}"
+                        <TextBox FlowDirection="LeftToRight" Language="en-US" Text="{Binding Url, UpdateSourceTrigger=PropertyChanged}"
              Height="50"/>
                     </StackPanel>
 
                     <StackPanel Grid.Row="2" Grid.Column="2" Margin="0,12,0,0">
-                        <TextBlock Text="Category" FontSize="11" FontWeight="SemiBold"
+                        <TextBlock Text="{loc:Loc Key=k292c06f0045a}" FontSize="{DynamicResource App.Font.Small}" FontWeight="SemiBold"
                Foreground="{DynamicResource App.TextMuted}" Margin="0,0,0,4"/>
                         <ComboBox ItemsSource="{Binding CategoryOptions}"
               SelectedValue="{Binding SelectedCategoryId, Mode=TwoWay}"
@@ -126,41 +131,74 @@
 
                     <!-- Row 3: Tags (full width) -->
                     <StackPanel Grid.Row="3" Grid.ColumnSpan="3" Margin="0,12,0,0">
-                        <TextBlock Text="Tags (comma‑separated)" FontSize="11" FontWeight="SemiBold"
+                        <TextBlock Text="{loc:Loc Key=k39306cb0e633}" FontSize="{DynamicResource App.Font.Small}" FontWeight="SemiBold"
                                    Foreground="{DynamicResource App.TextMuted}" Margin="0,0,0,4"/>
                         <TextBox Text="{Binding TagsText, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
 
                     <!-- Row 4: Notes (full width) -->
                     <StackPanel Grid.Row="4" Grid.ColumnSpan="3" Margin="0,12,0,0">
-                        <TextBlock Text="Notes" FontSize="11" FontWeight="SemiBold"
+                        <TextBlock Text="{loc:Loc Key=k8a7525b1492f}" FontSize="{DynamicResource App.Font.Small}" FontWeight="SemiBold"
                                    Foreground="{DynamicResource App.TextMuted}" Margin="0,0,0,4"/>
                         <TextBox Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}"
                                  AcceptsReturn="True" TextWrapping="Wrap"
                                  Height="80" VerticalScrollBarVisibility="Auto"/>
+                        <Expander Header="{loc:Loc Key=k5566db49faf3}" Foreground="{DynamicResource App.Text}" Margin="0,12,0,0">
+                            <StackPanel>
+                                <ItemsControl ItemsSource="{Binding CustomFields}">
+                                    <ItemsControl.ItemTemplate><DataTemplate>
+                                        <StackPanel Margin="0,8">
+                                            <TextBox Text="{Binding Name,UpdateSourceTrigger=PropertyChanged}" ToolTip="{loc:Loc Key=k2f5574bc5e68}"/>
+                                            <TextBox Text="{Binding Value,UpdateSourceTrigger=PropertyChanged}" Margin="0,4">
+                                                <TextBox.Style><Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}"><Style.Triggers><DataTrigger Binding="{Binding IsSecret}" Value="True"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></TextBox.Style>
+                                            </TextBox>
+                                            <PasswordBox FlowDirection="LeftToRight" Language="en-US" services:PasswordBinding.Enabled="True" services:PasswordBinding.Value="{Binding Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Margin="0,4">
+                                                <PasswordBox.Style><Style TargetType="PasswordBox" BasedOn="{StaticResource {x:Type PasswordBox}}"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding IsSecret}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></PasswordBox.Style>
+                                            </PasswordBox>
+                                            <StackPanel Orientation="Horizontal"><CheckBox Content="{loc:Loc Key=k7e32a729b122}" IsChecked="{Binding IsSecret}" Margin="0,0,8,0"/><Button Content="{loc:Loc Key=k7afbf56864f2}" Command="{Binding DataContext.RemoveFieldCommand,RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"/></StackPanel>
+                                        </StackPanel>
+                                    </DataTemplate></ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <Button Content="{loc:Loc Key=k5f42d901b61b}" Command="{Binding AddFieldCommand}" Margin="0,4"/>
+                            </StackPanel>
+                        </Expander>
+                        <Expander Header="{loc:Loc Key=k6ad9a2d5ea47}" Foreground="{DynamicResource App.Text}" Margin="0,12,0,0">
+                            <StackPanel>
+                                <TextBlock Text="{loc:Loc Key=k6c84ac1aa237}" TextWrapping="Wrap"/>
+                                <ComboBox ItemsSource="{Binding HistoryLimits}" SelectedItem="{Binding HistoryLimit}" ToolTip="{loc:Loc Key=k28f7abaa6f6d}" Margin="0,8"/>
+                                <ItemsControl ItemsSource="{Binding PasswordHistory}"><ItemsControl.ItemTemplate><DataTemplate>
+                                    <DockPanel Margin="0,4"><Button DockPanel.Dock="Right" Content="{loc:Loc Key=k77f6831f9b37}" Command="{Binding DataContext.UseHistoryCommand,RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"/><TextBlock Text="{Binding ChangedAt,StringFormat={}{0:g}}" VerticalAlignment="Center"/></DockPanel>
+                                </DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+                                <Button Content="{loc:Loc Key=k496121494e4a}" Command="{Binding ClearHistoryCommand}" Margin="0,8"/>
+                            </StackPanel>
+                        </Expander>
                         <Expander Margin="0,16,0,0" Foreground="{DynamicResource App.Text}">
                             <Expander.Header>
                                 <StackPanel>
-                                    <TextBlock Text="Two-step verification" FontWeight="SemiBold"/>
-                                    <TextBlock Text="{Binding TotpSetupStatus}" FontSize="11" Foreground="{DynamicResource App.TextMuted}" TextWrapping="Wrap"/>
+                                    <TextBlock Text="{loc:Loc Key=k7c0ff7eab32d}" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding TotpSetupStatus}" FontSize="{DynamicResource App.Font.Small}" Foreground="{DynamicResource App.TextMuted}" TextWrapping="Wrap"/>
                                 </StackPanel>
                             </Expander.Header>
                             <Border Background="{DynamicResource App.SurfaceAlt}" BorderBrush="{DynamicResource App.Border}" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,8,0,0">
                                 <StackPanel>
-                                    <TextBlock Text="Use MyVault like an authenticator" FontWeight="SemiBold"/>
-                                    <TextBlock Text="Generate a 6-digit login code that changes every 30 seconds. No SMS or internet connection is needed." TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}" Margin="0,4,0,12"/>
-                                    <TextBlock Text="1. Start on the website" FontWeight="SemiBold"/>
-                                    <TextBlock Text="Open the account's Security settings → Two-step verification / 2FA. Choose Authenticator app, not SMS." TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}" Margin="0,4,0,12"/>
-                                    <TextBlock Text="2. Get the manual setup key" FontWeight="SemiBold"/>
-                                    <TextBlock Text="Beside the QR code, choose Can't scan? / Enter key manually and copy the longer setup key. MyVault does not scan QR images yet." TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}" Margin="0,4,0,12"/>
-                                    <TextBlock Text="3. Paste that key here" FontWeight="SemiBold" Margin="0,0,0,4"/>
-                                    <PasswordBox x:Name="TotpBox" PasswordChanged="TotpBox_PasswordChanged" AutomationProperties.Name="Authenticator manual setup key" ToolTip="Paste the Base32 setup key, not a 6-digit code"/>
+                                    <TextBlock Text="{loc:Loc Key=ke7b11c71f19d}" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{loc:Loc Key=k16dfd3b61739}" TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}" Margin="0,4,0,12"/>
+                                    <TextBlock Text="{loc:Loc Key=k14e467f5a05e}" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{loc:Loc Key=kedf740a42c12}" TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}" Margin="0,4,0,12"/>
+                                    <TextBlock Text="{loc:Loc Key=k4a8880e0cec1}" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{loc:Loc Key=kd377aa1d7d26}" TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}" Margin="0,4,0,12"/>
+                                    <Button Content="{loc:Loc Key=ka67cec834ecd}" Click="ImportQr_Click" Margin="0,0,0,8"/>
+                                    <Expander Header="{loc:Loc Key=k9a6a831142ff}" Margin="0,0,0,12">
+                                        <StackPanel><PasswordBox x:Name="SetupLinkBox" FlowDirection="LeftToRight" ToolTip="{loc:Loc Key=kbe885c9daf52}"/><Button Content="{loc:Loc Key=k40933ea9829d}" Click="ImportLink_Click" Margin="0,4"/></StackPanel>
+                                    </Expander>
+                                    <TextBlock Text="{loc:Loc Key=k0843c6f2d49b}" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                    <PasswordBox FlowDirection="LeftToRight" Language="en-US" x:Name="TotpBox" PasswordChanged="TotpBox_PasswordChanged" AutomationProperties.Name="{loc:Loc Key=k6416f069b8c0}" ToolTip="{loc:Loc Key=kb5df4aea8212}"/>
                                     <TextBlock Text="{Binding TotpSetupHint}" TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}" Margin="0,6,0,12"/>
-                                    <TextBlock Text="4. Save, copy a code, and confirm" FontWeight="SemiBold"/>
-                                    <TextBlock Text="Save this entry in MyVault. Click its clock icon to copy a code, paste it into the website's verification field, then confirm on the website. Saving a key here alone does not turn on 2FA." TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}" Margin="0,4,0,12"/>
-                                    <TextBlock Text="5. Keep a recovery method" FontWeight="SemiBold"/>
-                                    <TextBlock Text="Store the website's recovery codes somewhere safe outside this vault. Password and authenticator key stored together share the same vault protection." TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}" Margin="0,4,0,12"/>
-                                    <TextBlock Text="Later logins: use your password, then the clock icon for a fresh code. If a code is rejected, wait for the next one and check Windows time. Supported: SHA-1 · 6 digits · 30 seconds." TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}"/>
+                                    <TextBlock Text="{loc:Loc Key=k7a2331991923}" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{loc:Loc Key=k1262ca8b0335}" TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}" Margin="0,4,0,12"/>
+                                    <TextBlock Text="{loc:Loc Key=k612db183138e}" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{loc:Loc Key=k01fdc3482382}" TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}" Margin="0,4,0,12"/>
+                                    <TextBlock Text="{loc:Loc Key=k9cd16754ef86}" TextWrapping="Wrap" Foreground="{DynamicResource App.TextMuted}"/>
                                 </StackPanel>
                             </Border>
                         </Expander>
@@ -169,13 +207,13 @@
             </ScrollViewer>
 
             <Grid Grid.Row="2" Margin="0,16,0,0">
-                <CheckBox Content="Mark as favorite" IsChecked="{Binding IsFavorite}"
+                <CheckBox Content="{loc:Loc Key=kb6c95926923a}" IsChecked="{Binding IsFavorite}"
                           HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <TextBlock Text="{Binding ErrorText}" Foreground="{DynamicResource App.Error}"
                                VerticalAlignment="Center" Margin="0,0,12,0" TextWrapping="Wrap" MaxWidth="220"/>
-                    <Button Content="Cancel" Click="Cancel_Click" IsCancel="True" Margin="0,0,8,0"/>
-                    <Button Content="Save" Click="Save_Click" IsDefault="True"
+                    <Button Content="{loc:Loc Key=k19766ed6ccb2}" Click="Cancel_Click" IsCancel="True" Margin="0,0,8,0"/>
+                    <Button Content="{loc:Loc Key=k1509f561f241}" Click="Save_Click" IsDefault="True"
                             Style="{StaticResource PrimaryButton}"/>
                 </StackPanel>
             </Grid>

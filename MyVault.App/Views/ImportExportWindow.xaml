@@ -1,13 +1,14 @@
 ﻿<views:GlassWindow x:Class="MyVault.App.Views.ImportExportWindow"
                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:loc="clr-namespace:MyVault.App.Services"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:vm="clr-namespace:MyVault.App.ViewModels"
                    xmlns:views="clr-namespace:MyVault.App.Views"
                    mc:Ignorable="d"
                    d:DataContext="{d:DesignInstance Type=vm:ImportExportViewModel}"
-                   Title="Backup &amp; Import / Export"
+                   Title="{loc:Loc Key=k1a9666ced629}"
                    Width="500"
                    SizeToContent="Height">
 
@@ -30,43 +31,37 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0">
-                <TextBlock Text="Backup &amp; Import / Export"
-                           FontSize="16" FontWeight="SemiBold"
+                <TextBlock Text="{loc:Loc Key=k1a9666ced629}"
+                           FontSize="{DynamicResource App.Font.Title}" FontWeight="SemiBold"
                            Foreground="{DynamicResource App.Text}"
                            Margin="0,0,0,16"/>
 
-                <TextBlock Text="Encrypted backup"
-                           FontSize="13" FontWeight="SemiBold"
+                <TextBlock Text="{loc:Loc Key=k0e6b09c31f1e}"
+                           FontSize="{DynamicResource App.Font.Body}" FontWeight="SemiBold"
                            Foreground="{DynamicResource App.Text}"/>
-                <TextBlock TextWrapping="Wrap" FontSize="12"
+                <TextBlock TextWrapping="Wrap" FontSize="{DynamicResource App.Font.Small}"
                            Foreground="{DynamicResource App.TextMuted}"
-                           Margin="0,4,0,10">
-                    Saves a byte-for-byte copy of your vault file. Fully encrypted, safe to
-                    keep in cloud storage or on a USB stick.
-                </TextBlock>
-                <Button Content="Save encrypted backup…"
+                           Margin="0,4,0,10" Text="{loc:Loc Key=kac788a2a8c44}"/>
+                <Button Content="{loc:Loc Key=k20377c05d54e}"
                         Command="{Binding SaveBackupCommand}"
                         HorizontalAlignment="Left"
                         Style="{StaticResource PrimaryButton}"/>
-                    <Button Content="Restore encrypted backup…" Command="{Binding RestoreBackupCommand}" Margin="0,8,0,0"/>
+                    <Button Content="{loc:Loc Key=k0b35d016eeb4}" Command="{Binding RestoreBackupCommand}" Margin="0,8,0,0"/>
 
             </StackPanel>
 
             <Separator Grid.Row="1" Margin="0,16" Background="{DynamicResource App.BorderSubtle}"/>
 
             <StackPanel Grid.Row="2">
-                <TextBlock Text="Export to CSV (plaintext)"
-                           FontSize="13" FontWeight="SemiBold"
+                <TextBlock Text="{loc:Loc Key=k3d0323708ced}"
+                           FontSize="{DynamicResource App.Font.Body}" FontWeight="SemiBold"
                            Foreground="{DynamicResource App.Text}"/>
                 <Border Background="{DynamicResource App.WarningBg}"
                         CornerRadius="6" Padding="10,8" Margin="0,4,0,10">
-                    <TextBlock TextWrapping="Wrap" FontSize="12"
-                               Foreground="{DynamicResource App.Warning}">
-                        CSV is NOT encrypted. Anyone with the file can read every password.
-                        Delete it immediately after use.
-                    </TextBlock>
+                    <TextBlock TextWrapping="Wrap" FontSize="{DynamicResource App.Font.Small}"
+                               Foreground="{DynamicResource App.Warning}" Text="{loc:Loc Key=ke01c69c5b15b}"/>
                 </Border>
-                <Button Content="Export to CSV…"
+                <Button Content="{loc:Loc Key=k8d22a71282b2}"
                         Command="{Binding ExportCsvCommand}"
                         HorizontalAlignment="Left"/>
             </StackPanel>
@@ -74,26 +69,24 @@
             <Separator Grid.Row="3" Margin="0,16" Background="{DynamicResource App.BorderSubtle}"/>
 
             <StackPanel Grid.Row="4">
-                <TextBlock Text="Import from CSV"
-                           FontSize="13" FontWeight="SemiBold"
+                <TextBlock Text="{loc:Loc Key=k9b1685f5ca12}"
+                           FontSize="{DynamicResource App.Font.Body}" FontWeight="SemiBold"
                            Foreground="{DynamicResource App.Text}"/>
-                <TextBlock TextWrapping="Wrap" FontSize="12"
+                <TextBlock TextWrapping="Wrap" FontSize="{DynamicResource App.Font.Small}"
                            Foreground="{DynamicResource App.TextMuted}"
-                           Margin="0,4,0,10">
-                    Supported columns: Title (required), Username, Password, URL, Notes, Tags.
-                    Imported entries are appended to your vault.
-                </TextBlock>
+                           Margin="0,4,0,10" Text="{loc:Loc Key=k0916eb6dd7d9}"/>
                 <StackPanel Orientation="Horizontal">
-                    <Button Content="Import from CSV…"
+                    <StackPanel><TextBlock Text="{loc:Loc Key=kc8de48edd183}"/><ComboBox ItemsSource="{Binding ImportSources}" SelectedItem="{Binding ImportSource}" Margin="0,4,0,8"><ComboBox.ItemTemplate><DataTemplate><TextBlock><TextBlock.Text><MultiBinding Converter="{StaticResource ChoiceLabel}"><Binding/><Binding Source="{x:Static loc:LocalizationService.Instance}" Path="Language"/></MultiBinding></TextBlock.Text></TextBlock></DataTemplate></ComboBox.ItemTemplate></ComboBox>
+                    <Button Content="{loc:Loc Key=k79514b769fcd}"
                             Command="{Binding ImportCsvCommand}"
-                            Margin="0,0,8,0"/>
-                    <Button Content="Download CSV template"
+                            Margin="0,0,8,0"/></StackPanel>
+                    <Button Content="{loc:Loc Key=k67f46a1d5a5d}"
                             Command="{Binding DownloadTemplateCommand}"/>
                 </StackPanel>
             </StackPanel>
 
             <Button Grid.Row="5"
-                    Content="Close"
+                    Content="{loc:Loc Key=k7d9eb7acb13e}"
                     HorizontalAlignment="Right"
                     Margin="0,16,0,0"
                     IsCancel="True"

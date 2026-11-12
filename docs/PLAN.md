@@ -20,13 +20,10 @@ Windows interactive validation must be reported separately from Linux compilatio
 - Phase 6: architecture, security, developer/user guides and four ADRs written. Cross-published unsigned win-x64 executable verified as a PE32+ GUI binary. No public release has been created.
 - Git integration: feature branch pushed. Final code CI passed on both Linux and Windows; merge uses the tested code plus documentation.
 
-## Later product work, not represented as complete
+## Approved follow-up phases 1–4
 
-- Full command palette with executable commands (current Ctrl+K focuses search).
-- Passphrase generation, persisted generator presets and stronger guessability estimation.
-- System light/dark following, custom accent selection, density/font controls and full Persian localization/RTL.
-- Custom templates/fields, API-key expiry reminders, password history and review center.
-- Scheduled backups, recent-vault list, bulk operations, QR/otpauth import and attachments.
-- Cloud synchronization, browser extension, biometric key wrapping and signed automatic updates.
+The previously deferred command palette, bulk actions, appearance controls/Persian, templates/custom fields/history, scheduled backups/recents/source import and QR import are now implemented. See [the approved checklist](PHASES-1-4.md), [usage guide](APPROVED-FEATURES-GUIDE.md) and ADRs 0006–0008. Current security boundaries are recorded in [the assessment](SECURITY-ASSESSMENT.md).
 
-These need individual acceptance criteria and, where sensitive data or new storage semantics are involved, additional ADRs. Do not mark the entire product wishlist complete based on this release.
+## Remaining product work
+
+Passphrase generation, persisted generator presets, stronger guessability estimation, API-key expiry reminders, review center, attachments, cloud synchronization, browser extension, biometric key wrapping and signed automatic updates are not represented as complete. The user approved phases 1–4; phase 5 remains outside this delivery.

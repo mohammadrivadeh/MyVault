@@ -1,6 +1,6 @@
 # ADR 0004: Local TOTP, manual Trash and non-destructive CSV import
 
-Status: Accepted
+Status: Accepted for the initial delivery; subsequent extensions are recorded in [0008-local-backups-and-import](0008-local-backups-and-import.md).
 
 Context: The entry schema already had an unused TOTP secret. Permanent deletion was immediate after confirmation. CSV cannot represent all vault metadata.
 

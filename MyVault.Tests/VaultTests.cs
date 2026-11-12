@@ -89,6 +89,7 @@ public sealed class VaultTests : IDisposable
     public void OriginalV1PayloadWithoutNewFieldsStillOpens()
     {
         var header = VaultHeader.CreateDefault();
+        header.FormatVersion = 1;
         byte[] key = System.Security.Cryptography.RandomNumberGenerator.GetBytes(32);
         byte[] headerJson = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(header, new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
         byte[] aad = new byte[9 + headerJson.Length];

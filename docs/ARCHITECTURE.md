@@ -22,3 +22,11 @@ On lock, the UI is hidden immediately, secondary windows are hidden and closed, 
 `MoonlightGlow.xaml` supplies shared control styles. A last merged palette dictionary overrides semantic `App.*` brushes. `ThemeService` swaps palettes without copying styles. Settings preview applies immediately and reverts on Cancel or session lock. `MotionService` gates transitions with both the user preference and Windows animation settings. Long unlock intro/glow runs only in Full mode.
 
 See ADRs for tradeoffs and format compatibility.
+
+## Approved phase extensions
+
+Version 2 adds item kinds, custom fields and bounded password revisions. Repository save upgrades old input atomically; header/document versions must match. Entry drafts use a hash fingerprint for unsaved-change detection, not a retained plaintext JSON snapshot. See ADR 0006.
+
+`AppearanceService` owns previewable display settings. Explicit message catalogs separate translated product labels from user content and stable enum identifiers. Shared typography/density/accent resources and per-window flow direction handle personalization; row icons keep fixed geometry. See ADR 0007.
+
+`ScheduledBackupService` belongs to an unlocked session. Only verified ciphertext crosses into background file I/O. `EncryptedBackupStore` verifies destination bytes and rotates strictly owned filenames per vault. Recent paths and schedule metadata live in local settings. `QrSetupReader` decodes bounded local images with pinned ZXing.Net; `AuthenticatorSetup` validates the resulting otpauth profile. CSV adapters share the core parser. See ADR 0008.

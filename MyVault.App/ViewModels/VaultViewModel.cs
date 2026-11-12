@@ -23,6 +23,7 @@ public sealed class VaultViewModel : ObservableObject
     private readonly DispatcherTimer _statusTimer;
     private readonly DispatcherTimer _countdownTimer;
 
+    private string _tagFilter = "";
     private bool _locked;
     private string _sortBy = "Title";
     private string _searchText = string.Empty;
@@ -54,7 +55,7 @@ public sealed class VaultViewModel : ObservableObject
 
         Entries = new ObservableCollection<VaultEntryViewModel>();
         foreach (var entry in _repository.Document.Entries)
-            Entries.Add(new VaultEntryViewModel(entry));
+            Entries.Add(WrapEntry(entry));
 
         Categories = new ObservableCollection<CategoryViewModel>();
         foreach (var cat in _repository.Document.Categories.OrderBy(c => c.Order))
@@ -73,6 +74,11 @@ public sealed class VaultViewModel : ObservableObject
         };
         _countdownTimer.Tick += OnCountdownTick;
 
+        CommandPaletteCommand = new RelayCommand(OpenCommandPalette);
+        SelectVisibleCommand = new RelayCommand(() => { foreach (var entry in EntriesView.Cast<VaultEntryViewModel>()) entry.IsSelected = true; });
+        ClearSelectionCommand = new RelayCommand(() => { foreach (var entry in Entries) entry.IsSelected = false; });
+        BulkEditCommand = new RelayCommand(BulkEdit, () => SelectionCount > 0);
+        BulkDeleteCommand = new RelayCommand(BulkDelete, () => SelectionCount > 0);
         RestoreCommand = new RelayCommand(p => RestoreEntry(Resolve(p)));
         CopyTotpCommand = new RelayCommand(p => CopyTotp(Resolve(p)));
         LockCommand = new RelayCommand(_ => Lock());
@@ -130,6 +136,8 @@ public sealed class VaultViewModel : ObservableObject
             {
                 OnPropertyChanged(nameof(IsAllFilter));
                 OnPropertyChanged(nameof(IsFavoritesFilter));
+                OnPropertyChanged(nameof(IsWeakFilter)); OnPropertyChanged(nameof(IsReusedFilter));
+                OnPropertyChanged(nameof(IsRecentFilter)); OnPropertyChanged(nameof(IsTrashFilter));
             }
         }
     }
@@ -140,6 +148,10 @@ public sealed class VaultViewModel : ObservableObject
         private set => SetProperty(ref _selectedCategoryId, value);
     }
 
+    public bool IsWeakFilter => _currentFilter == FilterKind.Weak;
+    public bool IsReusedFilter => _currentFilter == FilterKind.Reused;
+    public bool IsRecentFilter => _currentFilter == FilterKind.Recent;
+    public bool IsTrashFilter => _currentFilter == FilterKind.Trash;
     public bool IsAllFilter => _currentFilter == FilterKind.All;
     public bool IsFavoritesFilter => _currentFilter == FilterKind.Favorites;
 
@@ -186,10 +198,10 @@ public sealed class VaultViewModel : ObservableObject
     public string CountdownLabel => $" · {_countdownSeconds}s";
 
     public bool IsEmpty => EntriesView.IsEmpty;
-    public string EmptyStateText =>
+    public string EmptyStateText => LocalizationService.Text(
         _repository.Document.Entries.Count == 0
             ? "No entries yet — press Ctrl+N or click + New to add one."
-            : "No entries match your filter or search.";
+            : "No entries match your filter or search.");
 
     public IReadOnlyList<string> SortOptions { get; } = new[] { "Title", "Updated", "Created" };
     public string SortBy { get => _sortBy; set { if (SetProperty(ref _sortBy, value)) ApplySort(); } }
@@ -197,6 +209,57 @@ public sealed class VaultViewModel : ObservableObject
     {
         EntriesView.SortDescriptions.Clear();
         EntriesView.SortDescriptions.Add(new SortDescription(_sortBy == "Title" ? "Title" : _sortBy == "Updated" ? "Model.UpdatedAt" : "Model.CreatedAt", _sortBy == "Title" ? ListSortDirection.Ascending : ListSortDirection.Descending));
+    }
+    public ICommand CommandPaletteCommand { get; }
+    public ICommand SelectVisibleCommand { get; }
+    public ICommand ClearSelectionCommand { get; }
+    public ICommand BulkEditCommand { get; }
+    public ICommand BulkDeleteCommand { get; }
+    public int SelectionCount => Entries.Count(e => e.IsSelected);
+    public string SelectionSummary=>LocalizationService.Format("{0} selected",SelectionCount);
+    public string TagFilter { get => _tagFilter; set { if (SetProperty(ref _tagFilter, value)) { EntriesView.Refresh(); RefreshEmptyState(); } } }
+    private VaultEntryViewModel WrapEntry(VaultEntry entry)
+    {
+        var vm = new VaultEntryViewModel(entry);
+        vm.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(VaultEntryViewModel.IsSelected)) { OnPropertyChanged(nameof(SelectionCount)); OnPropertyChanged(nameof(SelectionSummary)); CommandManager.InvalidateRequerySuggested(); } };
+        return vm;
+    }
+    private void OpenCommandPalette()
+    {
+        var actions = new List<PaletteAction> {
+            new(LocalizationService.Text("New entry"),LocalizationService.Text("Create a vault item"),AddEntry),new(LocalizationService.Text("Lock vault"),LocalizationService.Text("Hide data and close the session"),Lock),
+            new(LocalizationService.Text("Settings"),LocalizationService.Text("Appearance, language and backup settings"),OpenSettings),new(LocalizationService.Text("Password health"),LocalizationService.Text("Review weak and reused passwords"),OpenHealth),
+            new(LocalizationService.Text("Import / export"),LocalizationService.Text("Transfer data and manage encrypted backups"),OpenImportExport),
+            new(LocalizationService.Text("Trash"),LocalizationService.Text("Restore deleted items"),()=>SetFilter("Trash")),new(LocalizationService.Text("All entries"),LocalizationService.Text("Show active items"),()=>SetFilter("All"))};
+        actions.AddRange(Entries.Where(e => e.IsActive).Select(e => new PaletteAction(e.Title, e.Subtitle, () => EditEntry(e))));
+        var vm = new CommandPaletteViewModel(actions);
+        var window = new CommandPaletteWindow(vm) { Owner = Application.Current.MainWindow };
+        if (window.ShowDialog() == true && !_locked) vm.Chosen?.Run();
+    }
+    private void BulkEdit()
+    {
+        var ids = Entries.Where(e => e.IsSelected && e.IsActive).Select(e => e.Id).ToHashSet();
+        if (ids.Count == 0) return;
+        var categories = new List<CategoryOption> { new(null, "(None)") };
+        categories.AddRange(SnapshotCategories().Select(c => new CategoryOption(c.Id, c.Name)));
+        var window = new BulkActionWindow(categories) { Owner = Application.Current.MainWindow };
+        if (window.ShowDialog() != true || _locked) return;
+        Commit(d =>
+        {
+            foreach (var entry in d.Entries.Where(e => ids.Contains(e.Id)))
+            {
+                if (window.ChangeCategory) entry.CategoryId = window.CategoryId;
+                if (window.TagToAdd.Length > 0 && !entry.Tags.Contains(window.TagToAdd, StringComparer.OrdinalIgnoreCase)) entry.Tags.Add(window.TagToAdd);
+                entry.UpdatedAt = DateTimeOffset.UtcNow;
+            }
+        });
+    }
+    private void BulkDelete()
+    {
+        var selected = Entries.Where(e => e.IsSelected).ToList();
+        if (selected.Count == 0 || !Dialogs.Confirm(LocalizationService.Format("Delete {0} selected entries? Active items move to Trash; items already in Trash are permanently removed.", selected.Count), "Delete selected")) return;
+        var ids = selected.Select(e => e.Id).ToHashSet();
+        Commit(d => { d.Entries.RemoveAll(e => ids.Contains(e.Id) && e.DeletedAt is not null); foreach (var e in d.Entries.Where(e => ids.Contains(e.Id))) e.DeletedAt = DateTimeOffset.UtcNow; });
     }
     public ICommand RestoreCommand { get; }
     public ICommand CopyTotpCommand { get; }
@@ -315,6 +378,7 @@ public sealed class VaultViewModel : ObservableObject
             if (vm.Model.CategoryId != _selectedCategoryId) return false;
         }
 
+        if (!string.IsNullOrWhiteSpace(_tagFilter) && !vm.Model.Tags.Contains(_tagFilter.Trim(), StringComparer.OrdinalIgnoreCase)) return false;
         return vm.Matches(_searchText);
     }
 
@@ -325,7 +389,7 @@ public sealed class VaultViewModel : ObservableObject
 
     private void ShowStatus(string message)
     {
-        StatusMessage = message;
+        StatusMessage = LocalizationService.Text(message);
         _statusTimer.Stop();
         _statusTimer.Start();
     }
@@ -371,7 +435,7 @@ public sealed class VaultViewModel : ObservableObject
         if (vm is null) return;
 
         if (!Dialogs.Confirm(
-                $"Delete \"{vm.Title}\"?\n\nThis moves the entry to Trash. Deleting it again from Trash is permanent.",
+                LocalizationService.Format("Delete \"{0}\"?\n\nThis moves the entry to Trash. Deleting it again from Trash is permanent.", vm.Title),
                 "Delete entry"))
             return;
 
@@ -430,12 +494,14 @@ public sealed class VaultViewModel : ObservableObject
     {
         Guid? selected = SelectedEntry?.Id;
         Entries.Clear();
-        foreach (var entry in _repository.Document.Entries) Entries.Add(new VaultEntryViewModel(entry));
+        foreach (var entry in _repository.Document.Entries) Entries.Add(WrapEntry(entry));
         Categories.Clear();
         foreach (var category in _repository.Document.Categories.OrderBy(c => c.Order))
             Categories.Add(new CategoryViewModel(category) { IsSelected = _currentFilter == FilterKind.Category && category.Id == SelectedCategoryId });
         SelectedEntry = Entries.FirstOrDefault(e => e.Id == selected);
         EntriesView.Refresh(); RefreshEmptyState();
+        OnPropertyChanged(nameof(SelectionCount)); OnPropertyChanged(nameof(SelectionSummary));
+        CommandManager.InvalidateRequerySuggested();
     }
     private void RestoreEntry(VaultEntryViewModel? vm)
     {
@@ -446,7 +512,7 @@ public sealed class VaultViewModel : ObservableObject
     {
         if (vm is null || vm.Model.DeletedAt is not null || !MyVault.Core.Services.Totp.IsValid(vm.Model.TotpSecret)) { Dialogs.Info("Add a valid Base32 secret in the entry editor.", "No TOTP secret"); return; }
         string code = MyVault.Core.Services.Totp.Generate(vm.Model.TotpSecret!, DateTimeOffset.UtcNow);
-        if (_clipboard.SetSecret(code)) ShowStatus("One-time code copied. Valid for " + (30 - DateTimeOffset.UtcNow.ToUnixTimeSeconds() % 30) + "s.");
+        if (_clipboard.SetSecret(code)) ShowStatus(LocalizationService.Format("One-time code copied. Valid for {0}s.", 30 - DateTimeOffset.UtcNow.ToUnixTimeSeconds() % 30));
         else Dialogs.Error("Clipboard is busy. Try again.", "Copy failed");
     }
 
@@ -456,7 +522,7 @@ public sealed class VaultViewModel : ObservableObject
     {
         StopCountdown();
 
-        CountdownMessage = message;
+        CountdownMessage = LocalizationService.Text(message);
         CountdownTotal = Math.Max(1, seconds);
         _countdownDurationSeconds = CountdownTotal;
 
@@ -522,6 +588,7 @@ public sealed class VaultViewModel : ObservableObject
         {
             _autoLock.SetIdleTimeout(_settings.Current.AutoLockMinutes);
             _clipboard.ClearSeconds = _settings.Current.ClearClipboardSeconds;
+            RefreshEmptyState();OnPropertyChanged(nameof(SelectionSummary));
             ShowStatus("Settings saved.");
         }
     }
@@ -575,10 +642,10 @@ public sealed class VaultViewModel : ObservableObject
         if (Application.Current.MainWindow is { } main && main.Content is UIElement content) content.Visibility = Visibility.Hidden;
         foreach (Window window in Application.Current.Windows.Cast<Window>().Where(w => w != Application.Current.MainWindow).ToArray())
         {
-            window.Visibility = Visibility.Hidden;
+            window.Opacity = 0;
             if (window.DataContext is SettingsViewModel preview) preview.RevertPreview();
             window.DataContext = null;
-            window.Close();
+            try { window.Close(); } catch (InvalidOperationException) { /* An active Closing handler will unwind after its child prompt closes. */ }
         }
         SelectedEntry = null;
         Entries.Clear();
