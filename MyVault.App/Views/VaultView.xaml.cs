@@ -142,8 +142,6 @@ public partial class VaultView : UserControl
 
     protected override void OnPreviewKeyDown(KeyEventArgs e)
     {
-        if (e.Key == Key.K && (Keyboard.Modifiers & ModifierKeys.Control) != 0 && DataContext is VaultViewModel paletteVm)
-        { paletteVm.CommandPaletteCommand.Execute(null); e.Handled = true; return; }
         if (e.Key == Key.F && (Keyboard.Modifiers & ModifierKeys.Control) != 0)
         {
             Keyboard.Focus(SearchBox);

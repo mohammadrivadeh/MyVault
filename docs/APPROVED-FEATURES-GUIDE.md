@@ -29,3 +29,7 @@ In authenticator setup, either paste a manual Base32 key, use an otpauth link or
 ## Upgrade behavior
 
 Version 1 vaults open normally and upgrade to header/document version 2 on save, with a rotated old-format backup. Old app versions reject the new file rather than dropping custom fields/history. Do not downgrade by opening the new file in an old app. The byte layout and encryption/KDF algorithms remain unchanged.
+
+## Interface simplification
+
+The command palette and bulk selection/edit/delete interface have been removed at the user's request. Ctrl+F remains normal search. Entry operations use their row icons. Categories appear above Smart views. Custom fields use separate cards with explicit name/value labels, an example name, and a display-masking checkbox; all values remain encrypted. Earlier sections describing the removed palette/bulk controls are historical and superseded by this revision.

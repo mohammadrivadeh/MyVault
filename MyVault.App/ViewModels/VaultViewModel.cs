@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
@@ -74,11 +74,6 @@ public sealed class VaultViewModel : ObservableObject
         };
         _countdownTimer.Tick += OnCountdownTick;
 
-        CommandPaletteCommand = new RelayCommand(OpenCommandPalette);
-        SelectVisibleCommand = new RelayCommand(() => { foreach (var entry in EntriesView.Cast<VaultEntryViewModel>()) entry.IsSelected = true; });
-        ClearSelectionCommand = new RelayCommand(() => { foreach (var entry in Entries) entry.IsSelected = false; });
-        BulkEditCommand = new RelayCommand(BulkEdit, () => SelectionCount > 0);
-        BulkDeleteCommand = new RelayCommand(BulkDelete, () => SelectionCount > 0);
         RestoreCommand = new RelayCommand(p => RestoreEntry(Resolve(p)));
         CopyTotpCommand = new RelayCommand(p => CopyTotp(Resolve(p)));
         LockCommand = new RelayCommand(_ => Lock());
@@ -210,11 +205,6 @@ public sealed class VaultViewModel : ObservableObject
         EntriesView.SortDescriptions.Clear();
         EntriesView.SortDescriptions.Add(new SortDescription(_sortBy == "Title" ? "Title" : _sortBy == "Updated" ? "Model.UpdatedAt" : "Model.CreatedAt", _sortBy == "Title" ? ListSortDirection.Ascending : ListSortDirection.Descending));
     }
-    public ICommand CommandPaletteCommand { get; }
-    public ICommand SelectVisibleCommand { get; }
-    public ICommand ClearSelectionCommand { get; }
-    public ICommand BulkEditCommand { get; }
-    public ICommand BulkDeleteCommand { get; }
     public int SelectionCount => Entries.Count(e => e.IsSelected);
     public string SelectionSummary=>LocalizationService.Format("{0} selected",SelectionCount);
     public string TagFilter { get => _tagFilter; set { if (SetProperty(ref _tagFilter, value)) { EntriesView.Refresh(); RefreshEmptyState(); } } }
@@ -223,43 +213,6 @@ public sealed class VaultViewModel : ObservableObject
         var vm = new VaultEntryViewModel(entry);
         vm.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(VaultEntryViewModel.IsSelected)) { OnPropertyChanged(nameof(SelectionCount)); OnPropertyChanged(nameof(SelectionSummary)); CommandManager.InvalidateRequerySuggested(); } };
         return vm;
-    }
-    private void OpenCommandPalette()
-    {
-        var actions = new List<PaletteAction> {
-            new(LocalizationService.Text("New entry"),LocalizationService.Text("Create a vault item"),AddEntry),new(LocalizationService.Text("Lock vault"),LocalizationService.Text("Hide data and close the session"),Lock),
-            new(LocalizationService.Text("Settings"),LocalizationService.Text("Appearance, language and backup settings"),OpenSettings),new(LocalizationService.Text("Password health"),LocalizationService.Text("Review weak and reused passwords"),OpenHealth),
-            new(LocalizationService.Text("Import / export"),LocalizationService.Text("Transfer data and manage encrypted backups"),OpenImportExport),
-            new(LocalizationService.Text("Trash"),LocalizationService.Text("Restore deleted items"),()=>SetFilter("Trash")),new(LocalizationService.Text("All entries"),LocalizationService.Text("Show active items"),()=>SetFilter("All"))};
-        actions.AddRange(Entries.Where(e => e.IsActive).Select(e => new PaletteAction(e.Title, e.Subtitle, () => EditEntry(e))));
-        var vm = new CommandPaletteViewModel(actions);
-        var window = new CommandPaletteWindow(vm) { Owner = Application.Current.MainWindow };
-        if (window.ShowDialog() == true && !_locked) vm.Chosen?.Run();
-    }
-    private void BulkEdit()
-    {
-        var ids = Entries.Where(e => e.IsSelected && e.IsActive).Select(e => e.Id).ToHashSet();
-        if (ids.Count == 0) return;
-        var categories = new List<CategoryOption> { new(null, "(None)") };
-        categories.AddRange(SnapshotCategories().Select(c => new CategoryOption(c.Id, c.Name)));
-        var window = new BulkActionWindow(categories) { Owner = Application.Current.MainWindow };
-        if (window.ShowDialog() != true || _locked) return;
-        Commit(d =>
-        {
-            foreach (var entry in d.Entries.Where(e => ids.Contains(e.Id)))
-            {
-                if (window.ChangeCategory) entry.CategoryId = window.CategoryId;
-                if (window.TagToAdd.Length > 0 && !entry.Tags.Contains(window.TagToAdd, StringComparer.OrdinalIgnoreCase)) entry.Tags.Add(window.TagToAdd);
-                entry.UpdatedAt = DateTimeOffset.UtcNow;
-            }
-        });
-    }
-    private void BulkDelete()
-    {
-        var selected = Entries.Where(e => e.IsSelected).ToList();
-        if (selected.Count == 0 || !Dialogs.Confirm(LocalizationService.Format("Delete {0} selected entries? Active items move to Trash; items already in Trash are permanently removed.", selected.Count), "Delete selected")) return;
-        var ids = selected.Select(e => e.Id).ToHashSet();
-        Commit(d => { d.Entries.RemoveAll(e => ids.Contains(e.Id) && e.DeletedAt is not null); foreach (var e in d.Entries.Where(e => ids.Contains(e.Id))) e.DeletedAt = DateTimeOffset.UtcNow; });
     }
     public ICommand RestoreCommand { get; }
     public ICommand CopyTotpCommand { get; }
