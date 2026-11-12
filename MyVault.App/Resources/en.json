@@ -345,5 +345,9 @@
   "kdbac5bed3e92": "Use a TOTP authenticator setup link.",
   "keebc5822acbe": "Only SHA-1, six digits and 30-second TOTP are supported.",
   "kd8e14b504ff1": "No readable QR code was found. Use the manual setup key instead.",
-  "kc2744b81fed1": "Strength is an estimate, not a guarantee or breach check."
+  "kc2744b81fed1": "Strength is an estimate, not a guarantee or breach check.",
+  "k8bd623ea86ce": "Field name (for example: Account number)",
+  "kdbe3edc4f713": "Value (the information to store)",
+  "k76deaa4fd503": "Add extra information that does not fit the standard fields. Give each field a name and a value. All values are encrypted.",
+  "kcf469b1a3a3e": "Hide this value on screen"
 }

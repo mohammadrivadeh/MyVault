@@ -38,3 +38,9 @@
 ### Compatibility
 
 MVLT1 byte layout and cryptographic algorithms remain unchanged. New saves write header/document version 2; older readers reject it. Old backups keep their original master password. CSV remains plaintext and lossy; use encrypted backups for full transfer.
+
+### Interface simplification
+
+- Removed command palette, its Ctrl+K shortcut and bulk selection/action controls.
+- Moved Categories above Smart views.
+- Reworked custom fields into labeled name/value cards with examples and clear masking language.

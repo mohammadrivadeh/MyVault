@@ -49,31 +49,6 @@
                         </StackPanel>
                     </RadioButton>
 
-                    <TextBlock Text="{loc:Loc Key=kfdd8549491a9}" Foreground="{DynamicResource App.TextMuted}" Margin="12,16,0,6"/>
-                    <RadioButton GroupName="Filter" Style="{StaticResource NavButton}" IsChecked="{Binding IsWeakFilter,Mode=OneWay}" Command="{Binding SetFilterCommand}" CommandParameter="Weak">
-                        <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="26"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="&#xE7BA;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Width="20" TextAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" TextWrapping="Wrap" MaxWidth="120" Text="{loc:Loc Key=k7c94df3b2522}" VerticalAlignment="Center"/>
-                        </Grid>
-                    </RadioButton>
-                    <RadioButton GroupName="Filter" Style="{StaticResource NavButton}" IsChecked="{Binding IsReusedFilter,Mode=OneWay}" Command="{Binding SetFilterCommand}" CommandParameter="Reused">
-                        <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="26"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="&#xE8D4;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Width="20" TextAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" TextWrapping="Wrap" MaxWidth="120" Text="{loc:Loc Key=kf3f35d906a66}" VerticalAlignment="Center"/>
-                        </Grid>
-                    </RadioButton>
-                    <RadioButton GroupName="Filter" Style="{StaticResource NavButton}" IsChecked="{Binding IsRecentFilter,Mode=OneWay}" Command="{Binding SetFilterCommand}" CommandParameter="Recent">
-                        <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="26"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="&#xE81C;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Width="20" TextAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" TextWrapping="Wrap" MaxWidth="120" Text="{loc:Loc Key=k5c79d33c3443}" VerticalAlignment="Center"/>
-                        </Grid>
-                    </RadioButton>
-                    <RadioButton GroupName="Filter" Style="{StaticResource NavButton}" IsChecked="{Binding IsTrashFilter,Mode=OneWay}" Command="{Binding SetFilterCommand}" CommandParameter="Trash">
-                        <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="26"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="&#xE74D;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Width="20" TextAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" TextWrapping="Wrap" MaxWidth="120" Text="{loc:Loc Key=kc560122ac470}" VerticalAlignment="Center"/>
-                        </Grid>
-                    </RadioButton>
                     <Border Height="1"
                             Background="{DynamicResource App.Border}"
                             Margin="8,8,8,8"/>
@@ -178,7 +153,32 @@
                                 </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                    </ItemsControl>                    <TextBlock Text="{loc:Loc Key=kfdd8549491a9}" Foreground="{DynamicResource App.TextMuted}" Margin="12,16,0,6"/>
+                    <RadioButton GroupName="Filter" Style="{StaticResource NavButton}" IsChecked="{Binding IsWeakFilter,Mode=OneWay}" Command="{Binding SetFilterCommand}" CommandParameter="Weak">
+                        <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="26"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE7BA;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Width="20" TextAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" MaxWidth="120" Text="{loc:Loc Key=k7c94df3b2522}" VerticalAlignment="Center"/>
+                        </Grid>
+                    </RadioButton>
+                    <RadioButton GroupName="Filter" Style="{StaticResource NavButton}" IsChecked="{Binding IsReusedFilter,Mode=OneWay}" Command="{Binding SetFilterCommand}" CommandParameter="Reused">
+                        <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="26"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE8D4;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Width="20" TextAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" MaxWidth="120" Text="{loc:Loc Key=kf3f35d906a66}" VerticalAlignment="Center"/>
+                        </Grid>
+                    </RadioButton>
+                    <RadioButton GroupName="Filter" Style="{StaticResource NavButton}" IsChecked="{Binding IsRecentFilter,Mode=OneWay}" Command="{Binding SetFilterCommand}" CommandParameter="Recent">
+                        <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="26"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE81C;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Width="20" TextAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" MaxWidth="120" Text="{loc:Loc Key=k5c79d33c3443}" VerticalAlignment="Center"/>
+                        </Grid>
+                    </RadioButton>
+                    <RadioButton GroupName="Filter" Style="{StaticResource NavButton}" IsChecked="{Binding IsTrashFilter,Mode=OneWay}" Command="{Binding SetFilterCommand}" CommandParameter="Trash">
+                        <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="26"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="&#xE74D;" FontFamily="{StaticResource App.IconFont}" FontSize="14" Width="20" TextAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" TextWrapping="Wrap" MaxWidth="120" Text="{loc:Loc Key=kc560122ac470}" VerticalAlignment="Center"/>
+                        </Grid>
+                    </RadioButton>
+
                     </StackPanel>
                 </ScrollViewer>
                 <StackPanel Grid.Row="1">
@@ -269,13 +269,7 @@
                     </TextBlock>
                 </Grid>
                 <WrapPanel Margin="0,8,0,0">
-                    <Button Content="{loc:Loc Key=kb25dc0353c76}" Command="{Binding CommandPaletteCommand}" Padding="6,4" Margin="2"/>
                     <TextBox Width="120" Text="{Binding TagFilter,UpdateSourceTrigger=PropertyChanged}" ToolTip="{loc:Loc Key=k17243c3c2082}" AutomationProperties.Name="{loc:Loc Key=kb9274474d099}" Margin="2"/>
-                    <Button Content="{loc:Loc Key=k70f58736b63e}" Command="{Binding SelectVisibleCommand}" Padding="6,4" Margin="2"/>
-                    <Button Content="{loc:Loc Key=kcea4d2e010b8}" Command="{Binding ClearSelectionCommand}" Padding="6,4" Margin="2"/>
-                    <Button Content="{loc:Loc Key=kdcbc054a145f}" Command="{Binding BulkEditCommand}" Padding="6,4" Margin="2"/>
-                    <Button Content="{loc:Loc Key=kd2ab5d46fed4}" Command="{Binding BulkDeleteCommand}" Padding="6,4" Margin="2"/>
-                    <TextBlock Text="{Binding SelectionSummary}" VerticalAlignment="Center" Margin="6" Foreground="{DynamicResource App.TextMuted}"/>
                 </WrapPanel>
                 </StackPanel>
             </Border>
@@ -355,7 +349,6 @@
 
                                         <!-- Contextual row actions; no separate details panel. -->
                                         <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                                            <CheckBox IsChecked="{Binding IsSelected}" ToolTip="{loc:Loc Key=k5ce132ef818f}" AutomationProperties.Name="{loc:Loc Key=k5ce132ef818f}" Margin="4,0,8,0" VerticalAlignment="Center"/>
                                             <Button Style="{StaticResource RowIconButton}"
                                                     Visibility="{Binding IsActive, Converter={StaticResource BoolToVis}}"
                                                     AutomationProperties.Name="{loc:Loc Key=k7ba3cdab9a58}"

@@ -60,36 +60,7 @@ public sealed class DesktopTests
     }
     private static void ExerciseApprovedPhases(Application app, Window main, VaultRepository repo, VaultViewModel vm, SettingsService settings, string dir, ListBox list)
     {
-        // Execute a real palette choice through the modal's bound command.
-        main.Dispatcher.BeginInvoke(() =>
-        {
-            var palette = app.Windows.OfType<CommandPaletteWindow>().Single();
-            var model = (CommandPaletteViewModel)palette.DataContext;
-            model.Query = "Trash"; Assert.Single(model.Actions.Cast<PaletteAction>());
-            model.RunCommand.Execute(null);
-        });
-        vm.CommandPaletteCommand.Execute(null); Assert.True(vm.IsTrashFilter);
-        vm.SetFilterCommand.Execute("All");
-        vm.SelectVisibleCommand.Execute(null); Assert.Equal(2, vm.SelectionCount);
-        main.Dispatcher.BeginInvoke(() =>
-        {
-            var bulk = app.Windows.OfType<BulkActionWindow>().Single();
-            ((TextBox)bulk.FindName("TagBox")).Text = "work";
-            Assert.Single(Descendants<Button>(bulk), b => Equals(b.Content, "Apply")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-        });
-        vm.BulkEditCommand.Execute(null);
-        vm.TagFilter = "work"; Assert.Equal(2, vm.EntriesView.Cast<VaultEntryViewModel>().Count());
-        Assert.All(repo.Document.Entries, e => Assert.Contains("work", e.Tags));
-        vm.SelectVisibleCommand.Execute(null);
-        main.Dispatcher.BeginInvoke(() =>
-        {
-            var confirmation = app.Windows.OfType<MessageDialog>().Single();
-            ((Button)confirmation.FindName("OkButton")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-        });
-        vm.BulkDeleteCommand.Execute(null);
-        Assert.All(repo.Document.Entries, e => Assert.NotNull(e.DeletedAt));
-        foreach (var entry in vm.Entries.ToArray()) vm.RestoreCommand.Execute(entry);
-        vm.TagFilter = ""; vm.SetFilterCommand.Execute("All"); main.UpdateLayout();
+        main.UpdateLayout();
         AssertIconCenters(list); Screenshot(main, "rows-en");
 
         var preference = new SettingsViewModel(settings, repo) { Theme = "Forest", Accent = "Violet", Language = "fa", TextSize = 18, Density = "Compact" };
