@@ -11,7 +11,7 @@ public enum PasswordStrengthLevel
 
 public static class PasswordStrength
 {
-    /// <summary>Rough Shannon-style entropy estimate: length × log2(charset size).</summary>
+    /// <summary>Display heuristic, not measured entropy or a breach check. Repetition is penalized.</summary>
     public static double EstimateBits(string? password)
     {
         if (string.IsNullOrEmpty(password)) return 0;
@@ -20,10 +20,20 @@ public static class PasswordStrength
         if (password.Any(char.IsLower)) pool += 26;
         if (password.Any(char.IsUpper)) pool += 26;
         if (password.Any(char.IsDigit)) pool += 10;
+        if (password.Any(c=>char.IsLetter(c) && !char.IsLower(c) && !char.IsUpper(c))) pool += 64;
         if (password.Any(c => !char.IsLetterOrDigit(c))) pool += 32;
         if (pool == 0) pool = 1;
 
-        return password.Length * Math.Log2(pool);
+        double bits=password.Length*Math.Log2(pool);
+        // Avoid calling long repeated runs "strong", including uncased Persian letters.
+        for(int period=1;period<=Math.Min(64,password.Length/2);period++)
+        {
+            if(password.Length%period!=0) continue;
+            bool repeated=true;
+            for(int i=period;i<password.Length;i++) if(password[i]!=password[i%period]) {repeated=false;break;}
+            if(repeated) {bits=Math.Min(bits,period*Math.Log2(pool)+Math.Log2(password.Length));break;}
+        }
+        return bits;
     }
 
     public static PasswordStrengthLevel Categorize(string? password)

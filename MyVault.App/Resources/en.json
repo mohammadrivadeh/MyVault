@@ -344,5 +344,6 @@
   "k5c7711430794": "{0} entries imported; {1} duplicates skipped.",
   "kdbac5bed3e92": "Use a TOTP authenticator setup link.",
   "keebc5822acbe": "Only SHA-1, six digits and 30-second TOTP are supported.",
-  "kd8e14b504ff1": "No readable QR code was found. Use the manual setup key instead."
+  "kd8e14b504ff1": "No readable QR code was found. Use the manual setup key instead.",
+  "kc2744b81fed1": "Strength is an estimate, not a guarantee or breach check."
 }

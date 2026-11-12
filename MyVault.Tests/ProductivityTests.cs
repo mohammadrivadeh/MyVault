@@ -8,6 +8,13 @@ namespace MyVault.Tests;
 
 public sealed class ProductivityTests
 {
+    [Theory]
+    [InlineData("aaaaaaaaaaaaaaaaaaaa")]
+    [InlineData("رمزرمزرمزرمزرمز")]
+    [InlineData("Ab1!Ab1!Ab1!Ab1!")]
+    public void RepeatedAndPersianPasswordsAreNotMisclassifiedAsEmptyOrStrong(string password)=>
+        Assert.Equal(PasswordStrengthLevel.Weak,PasswordStrength.Categorize(password));
+
     [Fact]
     public void PasswordHistoryIsBoundedAndCanBeDisabled()
     {
