@@ -7,7 +7,7 @@ This work is delivered in reviewable commits on a feature branch. Existing MVLT1
 | 1 | Core regression suite and CI | Actual crypto/storage/import tests pass; Windows builds |
 | 2 | Security and persistence | Bounded input, coordinated lock, owned clipboard, transactional edits |
 | 3 | Design system | Six palettes, live preview/revert, shared motion and reduced-motion support |
-| 4 | Daily workflow | Details, keyboard search, sorting and smart views |
+| 4 | Daily workflow | Compact row actions, keyboard search, sorting and smart views |
 | 5 | Vault capabilities | Generator controls, TOTP, trash and import duplicate policy |
 | 6 | Documentation and release | ADRs, user/developer docs, repeatable build and validation report |
 

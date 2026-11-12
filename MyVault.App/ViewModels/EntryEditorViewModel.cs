@@ -66,7 +66,30 @@ public sealed class EntryEditorViewModel : ObservableObject
     public bool GenerateDigits { get; set; } = true;
     public bool GenerateSymbols { get; set; } = true;
     public bool AvoidAmbiguous { get; set; } = true;
-    public string TotpSecret { get => _totpSecret; set => SetProperty(ref _totpSecret, value); }
+    public string TotpSecret
+    {
+        get => _totpSecret;
+        set
+        {
+            if (!SetProperty(ref _totpSecret, value)) return;
+            OnPropertyChanged(nameof(TotpSetupHint));
+            OnPropertyChanged(nameof(TotpSetupStatus));
+        }
+    }
+    public string TotpSetupStatus => string.IsNullOrWhiteSpace(TotpSecret)
+        ? "Optional · no setup key" : Totp.IsValid(TotpSecret) ? "Setup key added · confirm activation on the website" : "Check the setup key";
+    public string TotpSetupHint
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(TotpSecret)) return "Leave this blank if you use another authenticator. Your password can still be saved.";
+            if (TotpSecret.Trim().Length == 6 && TotpSecret.Trim().All(char.IsDigit)) return "That looks like a 6-digit code. Paste the longer setup key from the website instead.";
+            if (TotpSecret.Trim().StartsWith("otpauth://", StringComparison.OrdinalIgnoreCase)) return "That is a setup link. This version needs the Base32 key from the website's manual setup option.";
+            return Totp.IsValid(TotpSecret)
+                ? "Key format accepted. Save here, then use the row's clock icon to copy a code and confirm it on the website. MyVault cannot confirm activation for you."
+                : "Use the manual Base32 setup key (letters A–Z and digits 2–7), not a password, SMS code or QR image.";
+        }
+    }
     public string WindowTitle => _isNew ? "New" : "Edit";
     public bool IsNew => _isNew;
 
@@ -109,7 +132,7 @@ public sealed class EntryEditorViewModel : ObservableObject
     public string? Validate()
     {
         if (string.IsNullOrWhiteSpace(Title)) return "Title is required.";
-        if (!string.IsNullOrWhiteSpace(TotpSecret) && !Totp.IsValid(TotpSecret)) return "Enter a valid Base32 TOTP secret.";
+        if (!string.IsNullOrWhiteSpace(TotpSecret) && !Totp.IsValid(TotpSecret)) return TotpSetupHint;
         return null;
     }
 

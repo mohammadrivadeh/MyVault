@@ -5,7 +5,9 @@
 ### Added
 
 - Six semantic color palettes with preview/revert and shared motion preferences.
-- Wide-window entry details, Ctrl+K search, sorting and smart views.
+- Compact row actions, Ctrl+K search, sorting and smart views.
+- Two-step code and Trash restore icons on each applicable row; removed the redundant right details panel.
+- Five-step authenticator setup guidance, inline feedback for common key mistakes, and a Persian usage guide.
 - Encrypted Trash with restore/permanent deletion and configurable password generation.
 - Local RFC 6238 TOTP and creation of separate vault files.
 - Verified encrypted backup restoration and duplicate-skipping CSV import.

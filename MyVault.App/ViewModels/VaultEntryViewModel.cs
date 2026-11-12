@@ -15,6 +15,9 @@ public sealed class VaultEntryViewModel : ObservableObject
     public string Title => string.IsNullOrEmpty(Model.Title) ? "(no title)" : Model.Title;
     public string Password => Model.Password;
     public bool IsFavorite => Model.IsFavorite;
+    public bool IsDeleted => Model.DeletedAt is not null;
+    public bool IsActive => !IsDeleted;
+    public bool HasTotp => IsActive && MyVault.Core.Services.Totp.IsValid(Model.TotpSecret);
 
     public string Subtitle
     {
@@ -46,5 +49,8 @@ public sealed class VaultEntryViewModel : ObservableObject
         OnPropertyChanged(nameof(Password));
         OnPropertyChanged(nameof(Subtitle));
         OnPropertyChanged(nameof(IsFavorite));
+        OnPropertyChanged(nameof(IsDeleted));
+        OnPropertyChanged(nameof(IsActive));
+        OnPropertyChanged(nameof(HasTotp));
     }
 }
