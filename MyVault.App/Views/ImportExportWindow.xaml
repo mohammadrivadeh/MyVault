@@ -21,8 +21,10 @@
         </Border.Effect>
 
         <Grid Margin="20">
+            <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+            <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" MaxHeight="{DynamicResource App.DialogMaxHeight}">
+        <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -44,9 +46,9 @@
                            Margin="0,4,0,10" Text="{loc:Loc Key=kac788a2a8c44}"/>
                 <Button Content="{loc:Loc Key=k20377c05d54e}"
                         Command="{Binding SaveBackupCommand}"
-                        HorizontalAlignment="Left"
+                        HorizontalAlignment="Left" Padding="12,6" MinHeight="32"
                         Style="{StaticResource PrimaryButton}"/>
-                    <Button Content="{loc:Loc Key=k0b35d016eeb4}" Command="{Binding RestoreBackupCommand}" Margin="0,8,0,0"/>
+                    <Button Content="{loc:Loc Key=k0b35d016eeb4}" Command="{Binding RestoreBackupCommand}" HorizontalAlignment="Left" Padding="12,6" MinHeight="32" Margin="0,8,0,0"/>
 
             </StackPanel>
 
@@ -63,7 +65,7 @@
                 </Border>
                 <Button Content="{loc:Loc Key=k8d22a71282b2}"
                         Command="{Binding ExportCsvCommand}"
-                        HorizontalAlignment="Left"/>
+                        HorizontalAlignment="Left" Padding="12,6" MinHeight="32"/>
             </StackPanel>
 
             <Separator Grid.Row="3" Margin="0,16" Background="{DynamicResource App.BorderSubtle}"/>
@@ -75,17 +77,22 @@
                 <TextBlock TextWrapping="Wrap" FontSize="{DynamicResource App.Font.Small}"
                            Foreground="{DynamicResource App.TextMuted}"
                            Margin="0,4,0,10" Text="{loc:Loc Key=k0916eb6dd7d9}"/>
-                <StackPanel Orientation="Horizontal">
-                    <StackPanel><TextBlock Text="{loc:Loc Key=kc8de48edd183}"/><ComboBox ItemsSource="{Binding ImportSources}" SelectedItem="{Binding ImportSource}" Margin="0,4,0,8"><ComboBox.ItemTemplate><DataTemplate><TextBlock><TextBlock.Text><MultiBinding Converter="{StaticResource ChoiceLabel}"><Binding/><Binding Source="{x:Static loc:LocalizationService.Instance}" Path="Language"/></MultiBinding></TextBlock.Text></TextBlock></DataTemplate></ComboBox.ItemTemplate></ComboBox>
-                    <Button Content="{loc:Loc Key=k79514b769fcd}"
-                            Command="{Binding ImportCsvCommand}"
-                            Margin="0,0,8,0"/></StackPanel>
-                    <Button Content="{loc:Loc Key=k67f46a1d5a5d}"
-                            Command="{Binding DownloadTemplateCommand}"/>
-                </StackPanel>
+                <TextBlock Text="{loc:Loc Key=kc8de48edd183}" Margin="0,0,0,4"/>
+                <ComboBox ItemsSource="{Binding ImportSources}" SelectedItem="{Binding ImportSource}"
+                          HorizontalAlignment="Left" MinWidth="180" Margin="0,0,0,10">
+                    <ComboBox.ItemTemplate><DataTemplate><TextBlock><TextBlock.Text><MultiBinding Converter="{StaticResource ChoiceLabel}"><Binding/><Binding Source="{x:Static loc:LocalizationService.Instance}" Path="Language"/></MultiBinding></TextBlock.Text></TextBlock></DataTemplate></ComboBox.ItemTemplate>
+                </ComboBox>
+                <WrapPanel Margin="-4,0,-4,0">
+                    <Button Content="{loc:Loc Key=k79514b769fcd}" Command="{Binding ImportCsvCommand}"
+                            Padding="12,6" MinHeight="32" VerticalAlignment="Center" Margin="4,0,4,8"/>
+                    <Button Content="{loc:Loc Key=k67f46a1d5a5d}" Command="{Binding DownloadTemplateCommand}"
+                            Padding="12,6" MinHeight="32" VerticalAlignment="Center" Margin="4,0,4,8"/>
+                </WrapPanel>
             </StackPanel>
 
-            <Button Grid.Row="5"
+            </Grid>
+            </ScrollViewer>
+            <Button Grid.Row="1"
                     Content="{loc:Loc Key=k7d9eb7acb13e}"
                     HorizontalAlignment="Right"
                     Margin="0,16,0,0"
