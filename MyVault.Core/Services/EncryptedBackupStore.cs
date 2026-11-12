@@ -10,7 +10,9 @@ public static class EncryptedBackupStore
     {
         if (keep is < 1 or > 50) throw new ArgumentOutOfRangeException(nameof(keep));
         VaultFile.ReadHeader(encrypted);
-        string prefix = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(Path.GetFullPath(vaultPath).ToUpperInvariant())))[..16];
+        string identity=Path.GetFullPath(vaultPath);
+        if(OperatingSystem.IsWindows()) identity=identity.ToUpperInvariant();
+        string prefix = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(identity)))[..16];
         Directory.CreateDirectory(directory);
         string name = $"{prefix}-{DateTimeOffset.UtcNow:yyyyMMddHHmmssfffffff}-{Guid.NewGuid():N}.vault";
         string destination = Path.Combine(directory, name);
@@ -22,7 +24,7 @@ public static class EncryptedBackupStore
         var own = Directory.EnumerateFiles(directory, prefix + "-*.vault")
             .Where(p => System.Text.RegularExpressions.Regex.IsMatch(Path.GetFileName(p), "^" + prefix + "-[0-9]{21}-[0-9a-f]{32}\\.vault$"))
             .OrderByDescending(Path.GetFileName, StringComparer.Ordinal).ToList();
-        foreach (string file in own.Skip(keep))
+        foreach (string file in own.Where(p=>!string.Equals(Path.GetFullPath(p),Path.GetFullPath(destination),StringComparison.OrdinalIgnoreCase)).Skip(keep-1))
             if (!string.Equals(Path.GetFullPath(file), Path.GetFullPath(vaultPath), StringComparison.OrdinalIgnoreCase)) File.Delete(file);
         return destination;
     }

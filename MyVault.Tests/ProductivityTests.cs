@@ -78,6 +78,23 @@ public sealed class ProductivityTests
         finally { Directory.Delete(dir, true); }
     }
     [Fact]
+    public void RetentionKeepsNewSnapshotEvenWhenOlderNamesHaveFutureTimestamps()
+    {
+        string dir=Path.Combine(Path.GetTempPath(),"myvault-clock-"+Guid.NewGuid());Directory.CreateDirectory(dir);
+        try
+        {
+            byte[] blob=VaultFile.Encrypt(new(),new byte[32],VaultHeader.CreateDefault());
+            string first=EncryptedBackupStore.Write(blob,dir,"/synthetic/clock.vault",1);
+            string prefix=Path.GetFileName(first).Split('-')[0];
+            string future=Path.Combine(dir,prefix+"-209901010000000000000-"+Guid.NewGuid().ToString("N")+".vault");
+            File.Move(first,future);
+            string current=EncryptedBackupStore.Write(blob,dir,"/synthetic/clock.vault",1);
+            Assert.True(File.Exists(current));Assert.False(File.Exists(future));Assert.Single(Directory.GetFiles(dir));
+        }
+        finally {Directory.Delete(dir,true);}
+    }
+
+    [Fact]
     public void ScheduleHonorsOffDueAndFutureTimestamps()
     {
         var now = DateTimeOffset.UtcNow;
